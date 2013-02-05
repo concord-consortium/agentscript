@@ -1,0 +1,530 @@
+<html>
+  <head>
+    <title>AgentScript Model</title>
+    <script src="../agentscript.js"></script>
+    <script src="../coffee-script.js"></script>
+    <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/base/jquery-ui.css" type="text/css" media="all" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.0.1/d3.v3.min.js"></script>
+    <script src="http://lab.concord.org/lab/lab.grapher.js"></script>
+    <script type="text/coffeescript">
+    class ClimateModel extends ABM.Model
+      u = ABM.util # static variable
+      setup: -> # called by Model ctor
+        @refreshPatches = true
+        @agents.setDefaultShape "arrow"
+        @agentBreeds "sunrays heat IR CO2 clouds"
+
+        # globals
+        @sunBrightness = 100
+        @albedo = 0.3
+        @temperature = 13
+        @agentSize = 0.75
+        @skyTop = (15) - 5
+        @earthTop = 8 + (-15)
+        @sunlightHeading = -1.1
+        @numClouds = 0
+
+        # allow access to this model from window.ClimateModel
+        window.ClimateModel = this
+
+        @spacePatches =        (p for p in @patches when p.y == (15))
+        @skyTopPatches =       (p for p in @patches when p.y < (15) && p.y > @skyTop)
+        @skyPatches =          (p for p in @patches when p.y <= @skyTop && p.y > @earthTop)
+        @earthSurfacePatches = (p for p in @patches when p.y == @earthTop)
+        @earthPatches =        (p for p in @patches when p.y < @earthTop)
+
+        p.color = [0, 0, 0] for p in @spacePatches
+
+        for p in @skyTopPatches
+          p.color = [196, 196, 196] if p.y == @skyTop + 1
+          p.color = [128, 128, 128] if p.y == @skyTop + 2
+          p.color = [64, 64, 64]    if p.y == @skyTop + 3
+          p.color = [32, 32, 32]    if p.y == @skyTop + 4
+
+        p.color = [100, 150, 255] for p in @skyPatches
+        p.color = [255, 200, 200] for p in @earthPatches
+        @updateAlbedoOfSurface()
+        @createCO2(4)
+
+      setAlbedo: (percent) ->
+        @albedo = percent
+        @updateAlbedoOfSurface()
+
+      getAlbedo : ->
+        @albedo
+
+      setSunBrightness: (val) ->
+        @sunBrightness = val
+
+      getSunBrightness : ->
+        @sunBrightness
+
+      getTemperature : ->
+        @temperature
+
+      getCO2Count : ->
+        @CO2().length
+
+      addCO2: ->
+        @createCO2(1)
+
+      subtractCO2: ->
+        if @CO2().length > 0
+          @CO2().oneOf().die()
+
+      updateAlbedoOfSurface: ->
+        p.color = [Math.floor(196 * @albedo), Math.floor(255 * @albedo), Math.floor(196 * @albedo)]   for p in @earthSurfacePatches
+
+      reflectOffHorizontalPlane: (a) ->
+        heading = a.heading
+        newheading = heading
+        if heading > Math.PI
+          newheading = Math.PI - (heading - Math.PI)
+        if heading < Math.PI
+          newheading = Math.PI + (Math.PI - heading)
+        else
+          newheading = 0
+        a.heading = newheading
+
+      headingUp: (a) ->
+        heading = a.heading
+        heading > 0 && heading < Math.PI
+
+      transformToIR: (a) ->
+        a.breed = "IR"
+        a.heading = -@sunlightHeading
+        # a.heading = u.randomFloat2(2.6, 0.5)
+        # a.heading = u.randomCentered(Math.PI/4) + Math.PI/2
+        a.color = [200, 32, 200]
+        a.shape = "arrow"
+
+      transformToHeat: (a) ->
+        a.breed = "heat"
+        a.y = @earthTop-1
+        a.heading = u.randomFloat2(-0.5, -Math.PI+0.5)
+        a.shape = "circle"
+        randomLightness = u.randomInt2(32, 128)
+        a.color = [255, randomLightness, randomLightness]
+
+      #
+      # CO2
+      #
+      createCO2: (num) ->
+        while num > 0
+          num--
+          @agents.create 1, (a) =>
+            a.breed = "CO2"
+            a.size = @agentSize
+            a.color = [0, 255, 0]
+            a.shape ="pentagon"
+            a.heading = u.randomCentered(Math.PI)
+            a.setXY u.randomCentered(22), u.randomFloat2(@earthTop+1, @skyTop)
+
+      runCO2: ->
+        for a in @CO2()
+          if a
+            a.heading = a.heading + u.randomCentered(Math.PI/9)
+            a.forward 0.1
+            if a.y <= (-14)
+              a.heading = u.randomFloat2(0.1, Math.PI-0.1)
+            if a.y <= @earthTop + 1
+              a.heading = u.randomFloat2(Math.PI/4, Math.PI*3/4)
+            if a.y >= @skyTop + 1
+              a.heading = u.randomFloat2(-Math.PI/4, -Math.PI*3/4)
+
+      #
+      # IR
+      #
+      runIR: ->
+        for a in @IR()
+          if a
+            a.forward 0.5
+            if @CO2().inRadius(a, 1).any()
+              a.heading = u.randomFloat2(-Math.PI/4, -Math.PI*3/4)
+            a.die() if a.heading == -@sunlightHeading && a.y > (14)
+            if a.y <= @earthTop
+              @transformToHeat(a)
+
+      #
+      # Heat
+      #
+      runHeat: ->
+        @updateTemperature()
+        for a in @heat()
+          if a
+            a.heading = a.rotate(u.randomCentered(0.3))
+            a.forward u.randomFloat2(0.05, 0.2)
+            if a.y <= (-15)
+              a.heading = u.randomFloat2(0.1, Math.PI-0.1)
+            if a.y >= @earthTop
+              if @returnToSky
+                @transformToIR(a)
+              else
+                a.heading = u.randomCentered(2)
+
+      returnToSky: ->
+        u.randomInt(100) < (temperature * 20) && u.randomInt(20) < 2
+
+      updateTemperature: ->
+        @temperature = 0.99 * @temperature + 0.01 * (-7 + 0.5 * @heat().length)
+
+      leaveToSpace: (a) ->
+        heading = a.heading % Math.PI
+        ypos = a.y
+        if heading < Math.PI && heading > 0
+          if ypos < (-15) || ypos >= (15)
+            a.die()
+
+      #
+      # Clouds
+      #
+      addCloud: ->
+        @numClouds++
+        @setupClouds(@numClouds)
+
+      subtractCloud: ->
+        if @clouds().length
+          cloudNum = @clouds().oneOf().cloudNum
+          for a in @clouds()
+            a.die() if a.cloudNum == cloudNum
+
+      setupClouds: (num) ->
+        for a in @clouds()
+          a.die()
+        i = 0
+        while i < num
+          @makeCloud(i, num)
+          i++
+
+      makeCloud: (cloudNum, total) ->
+        width = @skyTop - @earthTop
+        mid = (@skyTop + @earthTop)/2
+        y = mid + width * ((cloudNum/total) - 0.3) - 2
+        y = 6 if cloudNum == 0
+        x = 2 * u.randomFloat(24) + -24
+        cloudParts = 3 + u.randomInt(16)
+        while cloudParts--
+          @agents.create 1, (a) =>
+            a.breed = "clouds"
+            a.cloudNum = cloudNum
+            a.color = [255,255,255]
+            a.size = @agentSize + 0.5 + u.randomFloat(1)
+            a.shape = "circle"
+            a.heading = 0
+            a.setXY x + u.randomFloat(5) - 4,  y + (u.randomFloat(u.randomFloat(3)))
+
+      runClouds: ->
+        for a in @clouds()
+          if a
+            a.forward 0.3 * (0.1 + (3 + a.cloudNum) / 10)
+
+      #
+      # Sunshine
+      #
+      runSunshine: ->
+        for a in @sunrays()
+          if a
+            a.forward 0.5
+            @leaveToSpace(a)
+        @createSunshine()
+        @reflectSunshineFromClouds()
+        @encounterEarth()
+
+      reflectSunshineFromClouds: ->
+        for a in @sunrays()
+          if a
+            if @clouds().inRadius(a, 1).any()
+              heading = u.randomFloat2(Math.PI/4, Math.PI*3/4)
+              if @headingUp a
+                heading = -heading
+              a.heading = heading
+
+      encounterEarth: ->
+        for a in @sunrays()
+          if a.y <= @earthTop
+            if @albedo * 100 > u.randomInt(100)
+              @reflectOffHorizontalPlane(a)
+            else
+              @transformToHeat(a)
+
+      createSunshine: ->
+        if 0.1 * @sunBrightness > u.randomInt(50)
+          @agents.create 1, (a) =>
+            a.breed = "sunrays"
+            a.size = @agentSize
+            a.color = [255,255,0]
+            a.heading = @sunlightHeading
+            a.setXY -24 + u.randomFloat(10), 15
+
+      #
+      # Main Model Loop
+      #
+      step: ->
+        @runSunshine()
+        @runClouds()
+        @runHeat()
+        @runIR()
+        @runCO2()
+
+    # divName, patchSize, minX, maxX, minY, maxY, isTorus = false, topLeft=[10,10]
+    #   NL Defaults: 13, -16, 16, -16, 16
+    APP=new ClimateModel "layers", 12, -24, 24, -15, 15, true #use torus
+    </script>
+
+    <style type="text/css">
+      body { font: 13px sans-serif; }
+      #content {
+        margin: 0em;
+        padding: 0em; }
+      p { font-size: 1.5em;
+        margin-left: 1.0em }
+      ul {
+        list-style-type: none;
+        margin: 0.3em 0em;
+        padding-left: 0em;
+        width: 100%; }
+        ul li {
+          display: table-cell;
+          vertical-align: middle;
+          margin: 0em;
+          padding: 0em 0.3em 0em 0.3em; }
+      #model {
+        display: table-cell;
+        margin: 0em 0.5em 0em 0.5em;
+        width: 600px; }
+      #layers {
+        margin: 0em;
+        padding: 0em; }
+      #playback-controls {
+        font-size: 1.1em;
+        display: inline-block;
+        width: 100% ;
+        background-color: #f8f8f8; }
+      #playback-controls li, button, span {
+        font-size: 1.1em; }
+      #controls {
+        display: table-cell;
+        vertical-align: top;
+        margin: 0em 0.5em 0em 0.5em;
+        padding: 0em;
+        font-size: 1.0em; }
+      #controls label, span {
+        font-size: 1.0em;
+        vertical-align: top; }
+      #controls button {
+        font-size: 1.0em;
+        vertical-align: middle; }
+      #controls .output {
+        font-size: 1.0em;
+        vertical-align: middle; }
+      #controls span.digits3 {
+        font-size: 1.0em;
+        margin: 0em;
+        padding: 0em;
+        float: right;
+        text-align: left;
+        width: 2em; }
+      #controls span.slider-units {
+        font-size: 90%;
+        font-style: italic; }
+      #chart {
+        display: inline-block;
+        position: relative;
+        width: 320px;
+        height: 250px;
+        margin: 0.1em 1em 1em 0em;
+        background-color: #ddf2ff;
+        border: solid 1px #6CC0FF;
+        border-radius: 0.25em; }
+      #chart.plot {
+        background-color: #f8f8fe; }
+      text.title {
+        font-size: 1.6em; }
+      text.axis {
+        font-size: 1.1em; }
+      circle, .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 2px; }
+      circle {
+        fill: white;
+        fill-opacity: 0.2;
+        cursor: move; }
+        circle.selected {
+          fill: #ff7f0e;
+          stroke: #ff7f0e; }
+        circle:hover {
+          fill: #ff7f0e;
+          stroke: #707f0e; }
+        circle.selected:hover {
+          fill: #ff7f0e;
+          stroke: #ff7f0e; }
+    </style>
+  </head>
+  <body onload="ABM.model.start(); setupControls();">
+    <div id="content">
+      <div id="model">
+        <canvas id="canvas" >Your browser does not support HTML5 Canvas.</canvas>
+        <div id="layers"></div>
+      </div>
+      <div id="controls">
+        <div id='chart'></div>
+        <ul>
+          <li>
+            <button id="add-co2-button">Add CO2</button>
+            <button id="subtract-co2-button">Subtract CO2</button>
+          </li>
+          <li>
+            <span id="co2-output" class="output digits3"></span>
+          </li>
+          <li class="output">
+            Temperature: <span id="temperature-output"></span>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <label for="albedo-slider">Albedo:</label>
+            <span class="slider-units">0 <input id="albedo-slider" type="range" min="0" max="1" step="0.01"/> 1</span>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <label for="sun-brightness-slider">Sun Brightness:</label>
+            <span class="slider-units">0 <input id="sun-brightness-slider" type="range" min="0" max="200" step="1"/> 200</span>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <button id="add-clouds-button">Add Cloud</button>
+            <button id="subtract-clouds-button">Subtract Cloud</button>
+          </li>
+          <li>
+            <span id="co2-output" class="output digits3"></span>
+          </li>
+        </ul>
+      </div>
+      <div id="playback-controls">
+        <ul>
+          <li>
+            <button id="reset-button">Reset</button>
+          </li>
+          <li>
+            <button id="play-button">Play</button>
+          </li>
+          <li>
+            <button id="step-button">Step</button>
+          </li>
+          <li>
+            <button id="stop-button">Stop</button>
+          </li>
+          <li>
+            Model Ticks: <span id="tick-counter"></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <script>
+      var addCO2Button = document.getElementById("add-co2-button"),
+          subtractCO2Button = document.getElementById("subtract-co2-button"),
+          albedoSlider = document.getElementById("albedo-slider"),
+          sunBrightnessSlider = document.getElementById("sun-brightness-slider"),
+          co2Output = document.getElementById("co2-output"),
+          temperatureOutput = document.getElementById("temperature-output"),
+          addCloudsButton = document.getElementById("add-clouds-button"),
+          subtractCloudsButton = document.getElementById("subtract-clouds-button"),
+          resetButton = document.getElementById("reset-button"),
+          playButton = document.getElementById("play-button"),
+          stopButton = document.getElementById("stop-button"),
+          stepButton = document.getElementById("step-button"),
+          tickCounter = document.getElementById("tick-counter"),
+          temperatureFormatter = d3.format("3.1f"),
+          countFormatter = d3.format("3f"),
+          ticks = 0,
+          graph,
+          graphOptions;
+
+      function setupControls() {
+        albedoSlider.value = ClimateModel.getAlbedo();
+        sunBrightnessSlider.value = ClimateModel.getSunBrightness();
+      }
+
+      addCO2Button.onclick = function() {
+        ClimateModel.addCO2()
+      }
+
+      subtractCO2Button.onclick = function() {
+        ClimateModel.subtractCO2()
+      }
+
+      addCloudsButton.onclick = function() {
+        ClimateModel.addCloud()
+      }
+
+      subtractCloudsButton.onclick = function() {
+        ClimateModel.subtractCloud()
+      }
+
+      albedoSlider.onchange = function() {
+        ClimateModel.setAlbedo(+albedoSlider.value)
+      }
+
+      sunBrightnessSlider.onchange = function() {
+        ClimateModel.setSunBrightness(+sunBrightnessSlider.value)
+      }
+
+      resetButton.onclick = function() {
+        ClimateModel.setup();
+      }
+
+      playButton.onclick = function() {
+        ClimateModel.start();
+      }
+
+      stopButton.onclick = function() {
+        ClimateModel.stop();
+      }
+
+      stepButton.onclick = function() {
+        ClimateModel.stop();
+        ClimateModel.animate();
+        updateTickCounter();
+      }
+
+      function updateTickCounter() {
+        ticks = ClimateModel.ticks;
+        tickCounter.textContent = ticks;
+      }
+
+      graphOptions = {
+        title:  "Temperature vs Time (model ticks)",
+        xlabel: "Time (ticks)",
+        ylabel: "Temperature",
+        xmax:   2000,
+        xmin:   0,
+        ymax:   40,
+        ymin:   -10,
+        xTicCount: 4,
+        xFormatter: "3.3r",
+        sample: 1
+      };
+
+      graph = Lab.grapher.realTimeGraph('#chart', graphOptions);
+
+      d3.timer(function(elapsed) {
+        if (typeof ClimateModel !== "undefined") {
+          var temperature = ClimateModel.getTemperature(),
+              co2Count = ClimateModel.getCO2Count();
+          temperatureOutput.textContent = temperatureFormatter(temperature);
+          co2Output.textContent = countFormatter(co2Count);
+          if (!ClimateModel.animStop) {
+            graph.add_points([temperature]);
+            updateTickCounter();
+          }
+        }
+      });
+
+    </script>
+  </body>
+</html>
