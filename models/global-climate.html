@@ -21,19 +21,19 @@
         @albedo = 0.3
         @temperature = 13
         @agentSize = 0.75
-        @skyTop = (15) - 5
-        @earthTop = 8 + (-15)
+        @skyTop = (@patches.maxY) - 5
+        @earthTop = 8 + @patches.minY
         @sunlightHeading = -1.1
         @numClouds = 0
 
         # allow access to this model from window.ClimateModel
         window.ClimateModel = this
 
-        @spacePatches =        (p for p in @patches when p.y == (15))
-        @skyTopPatches =       (p for p in @patches when p.y < (15) && p.y > @skyTop)
+        @spacePatches =        (p for p in @patches when p.y == @patches.maxY)
+        @skyTopPatches =       (p for p in @patches when p.y <  @patches.maxY && p.y > @skyTop)
         @skyPatches =          (p for p in @patches when p.y <= @skyTop && p.y > @earthTop)
         @earthSurfacePatches = (p for p in @patches when p.y == @earthTop)
-        @earthPatches =        (p for p in @patches when p.y < @earthTop)
+        @earthPatches =        (p for p in @patches when p.y <  @earthTop)
 
         p.color = [0, 0, 0] for p in @spacePatches
 
@@ -156,7 +156,7 @@
           if a
             a.heading = a.rotate(u.randomCentered(0.3))
             a.forward u.randomFloat2(0.05, 0.2)
-            if a.y <= (-15)
+            if a.y <= @patches.minY
               a.heading = u.randomFloat2(0.1, Math.PI-0.1)
             if a.y >= @earthTop
               if @returnToSky
@@ -174,7 +174,7 @@
         heading = a.heading % Math.PI
         ypos = a.y
         if heading < Math.PI && heading > 0
-          if ypos < (-15) || ypos >= (15)
+          if ypos < @patches.minY || ypos >= @patches.maxY
             a.die()
 
       #
@@ -203,7 +203,7 @@
         mid = (@skyTop + @earthTop)/2
         y = mid + width * ((cloudNum/total) - 0.3) - 2
         y = 6 if cloudNum == 0
-        x = 2 * u.randomFloat(24) + -24
+        x = 2 * u.randomFloat(@patches.maxX) + @patches.minX
         cloudParts = 3 + u.randomInt(16)
         while cloudParts--
           @agents.create 1, (a) =>
@@ -256,7 +256,7 @@
             a.size = @agentSize
             a.color = [255,255,0]
             a.heading = @sunlightHeading
-            a.setXY -24 + u.randomFloat(10), 15
+            a.setXY @patches.minX + u.randomFloat(10), @patches.maxX
 
       #
       # Main Model Loop
