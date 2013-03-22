@@ -16,6 +16,10 @@
         @agents.setDefaultShape "arrow"
         @agentBreeds "sunrays heat IR CO2 clouds"
 
+        # remove all existing agents
+        while @agents.length
+          @agents[@agents.length - 1].die()
+
         # globals
         @sunBrightness = 100
         @albedo = 0.3
@@ -185,10 +189,8 @@
         @setupClouds(@numClouds)
 
       subtractCloud: ->
-        if @clouds().length
-          cloudNum = @clouds().oneOf().cloudNum
-          for a in @clouds()
-            a.die() if a.cloudNum == cloudNum
+        @numClouds = Math.max @numClouds-1, 0
+        @setupClouds(@numClouds)
 
       setupClouds: (num) ->
         for a in @clouds()
@@ -256,7 +258,7 @@
             a.size = @agentSize
             a.color = [255,255,0]
             a.heading = @sunlightHeading
-            a.setXY @patches.minX + u.randomFloat(10), @patches.maxX
+            a.setXY @patches.minX + u.randomFloat(10), @patches.maxY
 
       #
       # Main Model Loop
