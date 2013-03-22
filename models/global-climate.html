@@ -93,7 +93,7 @@
         a.heading = newheading
 
       headingUp: (a) ->
-        heading = a.heading
+        heading = a.heading % Math.PI*2
         heading > 0 && heading < Math.PI
 
       transformToIR: (a) ->
@@ -260,6 +260,17 @@
             a.heading = @sunlightHeading
             a.setXY @patches.minX + u.randomFloat(10), @patches.maxY
 
+      addSunraySpotlight: ->
+        # try to add spotlight to a sunray at very top heading downwards
+        foundOne = false
+        for a in @sunrays().shuffle()
+          if not @headingUp(a) and a.y > @patches.maxY-5
+            foundOne = true
+            @setSpotlight a
+            break
+        if not foundOne
+          # if we did not find one, add spotlight to random sunray
+          @setSpotlight "sunrays"
       #
       # Main Model Loop
       #
@@ -477,7 +488,7 @@
       }
 
       followSunrayButton.onclick = function() {
-        ClimateModel.setSpotlight("sunrays")
+        ClimateModel.addSunraySpotlight()
       }
 
       followCO2Button.onclick = function() {
