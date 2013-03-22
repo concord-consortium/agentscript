@@ -406,6 +406,12 @@
             <span id="co2-output" class="output digits3"></span>
           </li>
         </ul>
+        <ul>
+          <li>
+            <button id="follow-sunray-button">Follow Energy Packet</button>
+            <button id="follow-co2-button">Follow CO2</button>
+          </li>
+        </ul>
       </div>
       <div id="playback-controls">
         <ul>
@@ -436,6 +442,8 @@
           temperatureOutput = document.getElementById("temperature-output"),
           addCloudsButton = document.getElementById("add-clouds-button"),
           subtractCloudsButton = document.getElementById("subtract-clouds-button"),
+          followSunrayButton = document.getElementById("follow-sunray-button"),
+          followCO2Button = document.getElementById("follow-co2-button"),
           resetButton = document.getElementById("reset-button"),
           playButton = document.getElementById("play-button"),
           stopButton = document.getElementById("stop-button"),
@@ -466,6 +474,20 @@
 
       subtractCloudsButton.onclick = function() {
         ClimateModel.subtractCloud()
+      }
+
+      followSunrayButton.onclick = function() {
+        ClimateModel.setSpotlight("sunrays")
+      }
+
+      followCO2Button.onclick = function() {
+        if (this.textContent === "Follow CO2") {
+          ClimateModel.setSpotlight("CO2");
+          this.textContent = "Stop following";
+        } else {
+          ClimateModel.removeSpotlight();
+          this.textContent = "Follow CO2";
+        }
       }
 
       albedoSlider.onchange = function() {
