@@ -12,6 +12,7 @@
     class ClimateModel extends ABM.Model
       u = ABM.util # static variable
       setup: -> # called by Model ctor
+        @ticks = 1
         @refreshPatches = true
         @agents.setDefaultShape "arrow"
         @agentBreeds "sunrays heat IR CO2 clouds"
@@ -311,9 +312,12 @@
         margin: 0em;
         padding: 0em; }
       #playback-controls {
+        position: absolute;
+        top: 385px;
+        left: 10px;
+        width: 588px;
         font-size: 1.1em;
         display: inline-block;
-        width: 100% ;
         background-color: #f8f8f8; }
       #playback-controls li, button, span {
         font-size: 1.1em; }
@@ -342,16 +346,15 @@
       #controls span.slider-units {
         font-size: 90%;
         font-style: italic; }
-      #chart {
-        display: inline-block;
+      .graph {
         position: relative;
         width: 320px;
-        height: 250px;
+        height: 140px;
         margin: 0.1em 1em 1em 0em;
         background-color: #ddf2ff;
         border: solid 1px #6CC0FF;
         border-radius: 0.25em; }
-      #chart.plot {
+      .graph.plot {
         background-color: #f8f8fe; }
       text.title {
         font-size: 1.6em; }
@@ -383,7 +386,8 @@
         <div id="layers"></div>
       </div>
       <div id="controls">
-        <div id='chart'></div>
+        <div id='temperature-graph' class="graph"></div>
+        <div id='co2-graph' class="graph"></div>
         <ul>
           <li>
             <button id="add-co2-button">Add CO2</button>
@@ -463,8 +467,8 @@
           temperatureFormatter = d3.format("3.1f"),
           countFormatter = d3.format("3f"),
           ticks = 0,
-          graph,
-          graphOptions;
+          temperatureGraph,
+          co2Graph;
 
       function setupControls() {
         albedoSlider.value = ClimateModel.getAlbedo();
@@ -510,6 +514,8 @@
       }
 
       resetButton.onclick = function() {
+        temperatureGraph.reset();
+        co2Graph.reset();
         ClimateModel.setup();
       }
 
@@ -532,20 +538,35 @@
         tickCounter.textContent = ticks;
       }
 
-      graphOptions = {
-        title:  "Temperature vs Time (model ticks)",
-        xlabel: "Time (ticks)",
-        ylabel: "Temperature",
-        xmax:   2000,
-        xmin:   0,
-        ymax:   40,
-        ymin:   -10,
-        xTicCount: 4,
-        xFormatter: "3.3r",
-        sample: 1
-      };
+      temperatureGraph = Lab.grapher.realTimeGraph('#temperature-graph',
+        {
+          title:  "Temperature vs Time (model ticks)",
+          xlabel: "Time (ticks)",
+          ylabel: "Temperature",
+          xmax:   2000,
+          xmin:   0,
+          ymax:   40,
+          ymin:   -10,
+          xTicCount: 4,
+          yTicCount: 5,
+          xFormatter: "3.3r",
+          sample: 1
+        });
 
-      graph = Lab.grapher.realTimeGraph('#chart', graphOptions);
+      co2Graph = Lab.grapher.realTimeGraph('#co2-graph',
+        {
+          title:  "CO2 vs Time (model ticks)",
+          xlabel: "Time (ticks)",
+          ylabel: "CO2",
+          xmax:   2000,
+          xmin:   0,
+          ymax:   20,
+          ymin:   0,
+          xTicCount: 4,
+          yTicCount: 5,
+          xFormatter: "3.3r",
+          sample: 1
+        });
 
       d3.timer(function(elapsed) {
         if (typeof ClimateModel !== "undefined") {
@@ -554,7 +575,8 @@
           temperatureOutput.textContent = temperatureFormatter(temperature);
           co2Output.textContent = countFormatter(co2Count);
           if (!ClimateModel.animStop) {
-            graph.add_points([temperature]);
+            temperatureGraph.add_points([temperature]);
+            co2Graph.add_points([co2Count]);
             updateTickCounter();
           }
         }
