@@ -469,6 +469,7 @@
           temperatureFormatter = d3.format("3.1f"),
           countFormatter = d3.format("3f"),
           ticks = 0,
+          lastTick = 0,
           temperatureGraph,
           co2Graph;
 
@@ -524,6 +525,7 @@
       }
 
       resetButton.onclick = function() {
+        lastTick = 0;
         temperatureGraph.reset();
         co2Graph.reset();
         ClimateModel.setup();
@@ -578,16 +580,23 @@
           sample: 1
         });
 
+      lastTick = 0;
+
       d3.timer(function(elapsed) {
         if (typeof ClimateModel !== "undefined") {
           var temperature = ClimateModel.getTemperature(),
-              co2Count = ClimateModel.getCO2Count();
+              co2Count = ClimateModel.getCO2Count(),
+              tick = ClimateModel.ticks,
+              ticksElapsed = tick - lastTick;
           temperatureOutput.textContent = temperatureFormatter(temperature);
           co2Output.textContent = countFormatter(co2Count);
-          if (!ClimateModel.animStop) {
-            temperatureGraph.add_points([temperature]);
-            co2Graph.add_points([co2Count]);
+          if (!ClimateModel.animStop && ticksElapsed) {
+            while (ticksElapsed--) {  // duplicate data if multiple model steps passed
+              temperatureGraph.add_points([temperature]);
+              co2Graph.add_points([co2Count]);
+            }
             updateTickCounter();
+            lastTick = tick;
           }
         }
       });
