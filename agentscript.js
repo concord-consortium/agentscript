@@ -2037,6 +2037,7 @@
       this.refreshLinks = this.refreshAgents = this.refreshPatches = true;
       this.fastPatches = false;
       this.setup();
+      this.animStop = true;
       if (this.agents.useSprites) {
         if (ABM.Agent.prototype.color != null) {
           this.agents.setDefaultSprite();
@@ -2152,6 +2153,9 @@
     Model.prototype.startup = function() {};
 
     Model.prototype.start = function() {
+      if (!this.animStop) {
+        return;
+      }
       if (this.ticks === 1) {
         this.startup();
       }

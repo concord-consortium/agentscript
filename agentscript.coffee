@@ -1522,7 +1522,9 @@ class ABM.Model
     
     # Call the models setup function.
     @setup()
-    
+
+    @animStop = true
+
     # Postprocesssing after setup
     if @agents.useSprites
       @agents.setDefaultSprite() if ABM.Agent::color?
@@ -1612,6 +1614,7 @@ class ABM.Model
 
 # Initializes the animation and starts the animation by calling `animate`
   start: ->
+    if not @animStop then return     # prevent multiple calls to start()
     if @ticks is 1
       @startup()
     @startMS = Date.now()
