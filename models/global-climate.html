@@ -443,8 +443,9 @@
             <button id="stop-button">Stop</button>
           </li>
           <li>
-            Model Ticks: <span id="tick-counter"></span>
+            <span class="slider-units">Slow <input id="speed-slider" type="range" min="0" max="10" step="1"/> Fast</span>
           </li>
+          Model Ticks: <span id="tick-counter"></span>
         </ul>
       </div>
     </div>
@@ -453,6 +454,7 @@
           subtractCO2Button = document.getElementById("subtract-co2-button"),
           albedoSlider = document.getElementById("albedo-slider"),
           sunBrightnessSlider = document.getElementById("sun-brightness-slider"),
+          speedSlider = document.getElementById("speed-slider"),
           co2Output = document.getElementById("co2-output"),
           temperatureOutput = document.getElementById("temperature-output"),
           addCloudsButton = document.getElementById("add-clouds-button"),
@@ -473,6 +475,7 @@
       function setupControls() {
         albedoSlider.value = ClimateModel.getAlbedo();
         sunBrightnessSlider.value = ClimateModel.getSunBrightness();
+        speedSlider.value = 5;
       }
 
       addCO2Button.onclick = function() {
@@ -511,6 +514,13 @@
 
       sunBrightnessSlider.onchange = function() {
         ClimateModel.setSunBrightness(+sunBrightnessSlider.value)
+      }
+
+      speedSlider.onchange = function() {
+        // scale value, 0=10, 5=60, 10=500
+        var val = speedSlider.value,
+            frequency = val <= 5 ? (val * 10)+10 : (val-5)*88 + 60;
+        ClimateModel.setStepFrequency(frequency);
       }
 
       resetButton.onclick = function() {
