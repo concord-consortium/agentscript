@@ -53,6 +53,7 @@
         p.color = [100, 150, 255] for p in @skyPatches
         p.color = [255, 200, 200] for p in @earthPatches
         @updateAlbedoOfSurface()
+        @createVolcano()
         @createCO2(4)
 
       setAlbedo: (percent) ->
@@ -119,7 +120,7 @@
       #
       # CO2
       #
-      createCO2: (num) ->
+      createCO2: (num, location, heading) ->
         while num > 0
           num--
           @agents.create 1, (a) =>
@@ -127,8 +128,9 @@
             a.size = @agentSize
             a.color = [0, 255, 0]
             a.shape ="pentagon"
-            a.heading = u.randomCentered(Math.PI)
-            a.setXY u.randomCentered(22), u.randomFloat2(@earthTop+1, @skyTop)
+            a.heading = if heading? then heading else u.randomCentered(Math.PI)
+            [x,y] = if location? then location else [u.randomCentered(22), u.randomFloat2(@earthTop+1, @skyTop)]
+            a.setXY x, y
 
       runCO2: ->
         for a in @CO2()
@@ -291,6 +293,32 @@
           @setSpotlight "sunrays"
 
       #
+      # Volcano
+      #
+      createVolcano: ->
+        @agents.create 1, (a) =>
+          a.size = 7
+          a.color = [188, 140, 56]
+          a.shape ="triangle"
+          a.heading = Math.PI / 2
+          a.setXY -17, -3
+        @agents.create 1, (a) =>
+          a.size = 3
+          a.color = [255, 255, 255]
+          a.shape ="triangle"
+          a.heading = Math.PI / 2
+          a.setXY -17, -1
+        @agents.create 1, (a) =>
+          a.size = 6
+          a.color = [100, 150, 255]
+          a.shape ="circle"
+          a.setXY -17, 1
+
+      erupt: ->
+        for i in [0...15]
+          @createCO2 1, [-17, -1.5], Math.PI/2
+
+      #
       # Global Functions
       #
       hide90: ->
@@ -344,6 +372,9 @@
         margin: 0em 0.5em 0em 0.5em;
         width: 600px; }
       #layers {
+        position: absolute;
+        top: 10px;
+        left: 10px;
         margin: 0em;
         padding: 0em; }
       #playback-controls {
@@ -466,6 +497,9 @@
           <li>
             <button id="hide-button">Hide 90% of elements</button>
           </li>
+          <li>
+            <button id="erupt-button">Erupt!</button>
+          </li>
         </ul>
       </div>
       <div id="playback-controls">
@@ -502,6 +536,7 @@
           followSunrayButton = document.getElementById("follow-sunray-button"),
           followCO2Button = document.getElementById("follow-co2-button"),
           hideButton = document.getElementById("hide-button"),
+          eruptButton = document.getElementById("erupt-button"),
           resetButton = document.getElementById("reset-button"),
           playButton = document.getElementById("play-button"),
           stopButton = document.getElementById("stop-button"),
@@ -558,6 +593,10 @@
           ClimateModel.showAll();
           this.textContent = "Hide 90% of elements";
         }
+      }
+
+      eruptButton.onclick = function() {
+        ClimateModel.erupt();
       }
 
       albedoSlider.onchange = function() {
