@@ -271,13 +271,14 @@
               @transformToHeat(a)
 
       createSunshine: ->
+        modelWidth = @patches.maxX - @patches.minX
         if 0.1 * @sunBrightness > u.randomInt(50)
           @agents.create 1, (a) =>
             a.breed = "sunrays"
             a.size = @agentSize
             a.color = [255,255,0]
             a.heading = @sunlightHeading
-            a.setXY @patches.minX + u.randomFloat(10), @patches.maxY
+            a.setXY @patches.minX + u.randomFloat(modelWidth), @patches.maxY
             a.hidden = unless @hiding90 and Math.random() > 0.1 then false else true
 
       addSunraySpotlight: ->
