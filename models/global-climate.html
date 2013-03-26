@@ -75,10 +75,11 @@
         @CO2().length
 
       addCO2: ->
-        @createCO2(1)
+        @createCO2( Math.max 1, Math.round @CO2().length*0.1 )
 
       subtractCO2: ->
-        if @CO2().length > 0
+        quant = Math.ceil @CO2().length*0.1
+        while quant--
           @CO2().oneOf().die()
 
       updateAlbedoOfSurface: ->
