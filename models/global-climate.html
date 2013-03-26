@@ -24,7 +24,7 @@
         # globals
         @sunBrightness = 100
         @albedo = 0.3
-        @temperature = 13
+        @temperature = 5
         @agentSize = 0.75
         @skyTop = (@patches.maxY) - 5
         @earthTop = 8 + @patches.minY
@@ -54,7 +54,8 @@
         p.color = [255, 200, 200] for p in @earthPatches
         @updateAlbedoOfSurface()
         @createVolcano()
-        @createCO2(4)
+        @createCO2(30)
+        @createHeat(20)
 
       setAlbedo: (percent) ->
         @albedo = percent
@@ -121,15 +122,14 @@
       # CO2
       #
       createCO2: (num, location, heading) ->
-        while num > 0
-          num--
+        while num--
           @agents.create 1, (a) =>
             a.breed = "CO2"
             a.size = @agentSize
             a.color = [0, 255, 0]
             a.shape ="pentagon"
             a.heading = if heading? then heading else u.randomCentered(Math.PI)
-            [x,y] = if location? then location else [u.randomCentered(22), u.randomFloat2(@earthTop+1, @skyTop)]
+            [x,y] = if location? then location else @getRandomLocation(@earthTop+1, @skyTop)
             a.setXY x, y
 
       runCO2: ->
@@ -186,6 +186,19 @@
         if heading < Math.PI && heading > 0
           if ypos < @patches.minY || ypos >= @patches.maxY
             a.die()
+
+      createHeat: (num) ->
+        while num--
+          [x,y] = @getRandomLocation(@patches.minY, @earthTop)
+          @agents.create 1, (a) =>
+            a.breed = "heat"
+            a.size = @agentSize
+            a.heading = u.randomFloat2(-0.5, -Math.PI+0.5)
+            a.shape = "circle"
+            randomLightness = u.randomInt2(32, 128)
+            a.color = [255, randomLightness, randomLightness]
+            a.setXY x, y
+
 
       #
       # Clouds
@@ -335,6 +348,12 @@
         @hiding90 = false
         for a in @agents
           a.hidden = false
+
+      getRandomLocation: (minY, maxY) ->
+        [
+          u.randomFloat2 @patches.minX, @patches.maxX
+          u.randomFloat2 minY, maxY
+        ]
 
       #
       # Main Model Loop
@@ -663,7 +682,7 @@
           ylabel: "CO2",
           xmax:   2000,
           xmin:   0,
-          ymax:   20,
+          ymax:   100,
           ymin:   0,
           xTicCount: 4,
           yTicCount: 5,
