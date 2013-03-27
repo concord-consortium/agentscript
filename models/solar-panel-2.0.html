@@ -117,9 +117,8 @@
               a.die()
 
       resetModel: ->
-        debugger
         @agents.clear()
-        u.clearCanvas(@contexts.drawing)
+        u.clearCtx(@contexts.drawing)
         @draw()
         @hitCount = 0
         @missCount = 0
