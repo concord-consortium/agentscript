@@ -2166,6 +2166,7 @@
       }
       if (this.ticks === 1) {
         this.startup();
+        this.draw();
       }
       this.startMS = Date.now();
       this.startTick = this.ticks;

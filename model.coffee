@@ -170,6 +170,7 @@ class ABM.Model
     if not @animStop then return     # prevent multiple calls to start()
     if @ticks is 1
       @startup()
+      @draw()       # force a draw to paint initial scene
     @startMS = Date.now()
     @startTick = @ticks
     @animStop = false
