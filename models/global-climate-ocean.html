@@ -64,7 +64,6 @@
           else p.color = [30, 30, 240]
 
         @updateAlbedoOfSurface()
-        @createVolcano()
         @createCO2(13)
         @createVapor(5)
         @createHeat(22)
@@ -595,9 +594,6 @@
           <li>
             <button id="hide-button">Hide 90% of elements</button>
           </li>
-          <li>
-            <button id="erupt-button">Erupt!</button>
-          </li>
         </ul>
       </div>
       <div id="playback-controls">
@@ -634,7 +630,6 @@
           followSunrayButton = document.getElementById("follow-sunray-button"),
           followCO2Button = document.getElementById("follow-co2-button"),
           hideButton = document.getElementById("hide-button"),
-          eruptButton = document.getElementById("erupt-button"),
           resetButton = document.getElementById("reset-button"),
           playButton = document.getElementById("play-button"),
           stopButton = document.getElementById("stop-button"),
@@ -691,10 +686,6 @@
           ClimateModel.showAll();
           this.textContent = "Hide 90% of elements";
         }
-      }
-
-      eruptButton.onclick = function() {
-        ClimateModel.erupt();
       }
 
       albedoSlider.onchange = function() {
