@@ -443,8 +443,7 @@
 
       .graph {
         position: relative;
-        margin: 0.1em 1em 1em 0em;
-        background: rgba(200, 240, 255, 0); }
+        background: rgba(255, 255, 255, 0); }
         .graph:focus {
           outline: #76d2b8 solid 0.2em; }
         .graph div.background {
@@ -468,13 +467,17 @@
       svg.graph text.title {
         font-size: 0.9em; }
       svg.graph text.ylabel {
-        font-size: 0.9em; }
+        font-size: 0.8em; }
       svg.graph text.xlabel {
-        font-size: 0.9em; }
+        font-size: 0.8em; }
       svg.graph text.axis {
         font-size: 0.8em; }
         svg.graph text.axis:focus {
           outline: #76d2b8 solid 0.2em; }
+      svg.graph rect.draggable-axis {
+        fill: rgba(255, 255, 255, 0); }
+        svg.graph rect.draggable-axis:hover {
+          fill: rgba(196, 196, 196, 0.2); }
 
       circle, .line {
         fill: none;
