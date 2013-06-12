@@ -49,8 +49,11 @@
       getVaporCount : ->
         @vapor().length
 
-      getCO2Count : ->
-        @CO2().with("o.y > #{@oceanBottom}").length
+      getAtmosphereCO2Count : ->
+        @CO2().with("o.y > #{@earthTop}").length
+
+      getOceanCO2Count : ->
+        @CO2().with("o.y <= #{@earthTop}").length
 
       updateAlbedoOfSurface: ->
         earthAlbedo = (Math.floor(a+@albedo*100) for a in [96, 155, 96])
@@ -552,12 +555,12 @@
 
       co2Graph = Lab.grapher.Graph('#co2-graph',
         {
-          title:  "CO2 (red) and Vapor (green) vs Time (model ticks)",
+          title:  "Air CO2 (red), Ocean CO2 (green), Vapor (green) vs Time (model ticks)",
           xlabel: "Time (ticks)",
           ylabel: "CO2",
           xmax:   2000,
           xmin:   0,
-          ymax:   40,
+          ymax:   30,
           ymin:   0,
           xTickCount: 4,
           yTickCount: 5,
@@ -572,16 +575,17 @@
       d3.timer(function(elapsed) {
         if (typeof climateModel !== "undefined") {
           var temperature = climateModel.getTemperature(),
-              co2Count = climateModel.getCO2Count(),
+              atmosphereCO2Count = climateModel.getAtmosphereCO2Count(),
+              oceanCO2Count = climateModel.getOceanCO2Count(),
               vaporCount = climateModel.getVaporCount(),
               tick = climateModel.ticks,
               ticksElapsed = tick - lastTick;
           temperatureOutput.textContent = temperatureFormatter(temperature);
-          co2Output.textContent = countFormatter(co2Count);
+          co2Output.textContent = countFormatter(atmosphereCO2Count);
           if (!climateModel.animStop && ticksElapsed) {
             while (ticksElapsed--) {  // duplicate data if multiple model steps passed
               temperatureGraph.addSamples([temperature]);
-              co2Graph.addSamples([co2Count, vaporCount]);
+              co2Graph.addSamples([atmosphereCO2Count, oceanCO2Count, vaporCount]);
             }
             updateTickCounter();
             lastTick = tick;
