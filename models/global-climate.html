@@ -390,8 +390,8 @@
           co2Output.textContent = countFormatter(co2Count);
           if (!climateModel.animStop && ticksElapsed) {
             while (ticksElapsed--) {  // duplicate data if multiple model steps passed
-              temperatureGraph.addPoints([temperature]);
-              co2Graph.addPoints([co2Count]);
+              temperatureGraph.addSamples([temperature]);
+              co2Graph.addSamples([co2Count]);
             }
             updateTickCounter();
             lastTick = tick;
