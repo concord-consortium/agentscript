@@ -27,7 +27,9 @@
 
         # globals
         @oceanLeft = -5
+        @oceanBottom = -15
         @vaporPerDegree = 0.6
+        @nCO2Emission = 0.25
         @earthPatches =        (p for p in @patches when p.y <  @earthTop and p.x < @oceanLeft)
         @oceanPatches =        (p for p in @patches when p.y <  @earthTop and p.x >= @oceanLeft)
 
@@ -47,6 +49,9 @@
       getVaporCount : ->
         @vapor().length
 
+      getCO2Count : ->
+        @CO2().with("o.y > #{@oceanBottom}").length
+
       updateAlbedoOfSurface: ->
         earthAlbedo = (Math.floor(a+@albedo*100) for a in [96, 155, 96])
         oceanAlbedo = (Math.floor(a+@albedo*200) for a in [0, 0, 220])
@@ -59,14 +64,29 @@
       runCO2: ->
         for a in @CO2()
           if a
+            speed = 0.1
             a.heading = a.heading + u.randomCentered(Math.PI/9)
-            a.forward 0.1
-            if a.y <= (-14)
-              a.heading = u.randomFloat2(0.1, Math.PI-0.1)
-            if a.y <= @earthTop + 1 and a.x < @oceanLeft
+            if a.y <= @oceanBottom                          # stop at bottom of ocean
+              speed = 0
+            if a.y <= @earthTop + 1 and a.x < @oceanLeft    # bounce off land
               a.heading = u.randomFloat2(Math.PI/4, Math.PI*3/4)
-            if a.y >= @skyTop + 1
+            if a.y >= @skyTop + 1                           # bounce off sky
               a.heading = u.randomFloat2(-Math.PI/4, -Math.PI*3/4)
+
+            a.forward speed
+
+      emitCO2: ->
+        # pick a random patch from the surface
+        random = Math.floor(Math.random() * @earthSurfacePatches.length)
+        surfacePatch = @earthSurfacePatches[random]
+
+        # if its on the earth
+        if surfacePatch.x < @oceanLeft
+          for n in [0...3]       # loop 3 times
+            if @nCO2Emission > Math.random()*3
+              @createCO2 1, [surfacePatch.x, surfacePatch.y+1], Math.PI/2
+
+
 
       #
       # Water vapor
@@ -179,6 +199,8 @@
         @runVapor()
 
         # less-frequent functions
+        if @ticks % 20 is 0
+          @emitCO2()
         if @ticks % 30 is 0
           @updateVapor()
 
