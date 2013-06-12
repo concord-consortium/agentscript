@@ -10,6 +10,10 @@ files="\
 
 echo "cat .coffee files to agentscript.coffee"
 cat $files > agentscript.coffee
+
+echo "building agenscript.js"
+coffee -j agentscript.js -c $files
+
 echo "uglify agentscript.js"
 uglifyjs agentscript.js -c -m > agentscript.min.js
 #echo "zip agentscript/"
