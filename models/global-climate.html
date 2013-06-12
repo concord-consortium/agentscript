@@ -36,8 +36,8 @@
         @hiding90 = false
         @showFPS = false
 
-        # allow access to this model from window.ClimateModel
-        window.ClimateModel = this
+        # allow access to this model from window.climateModel
+        window.climateModel = this
 
         @spacePatches =        (p for p in @patches when p.y == @patches.maxY)
         @skyTopPatches =       (p for p in @patches when p.y <  @patches.maxY && p.y > @skyTop)
@@ -605,93 +605,93 @@
           co2Graph;
 
       function setupControls() {
-        albedoSlider.value = ClimateModel.getAlbedo();
-        sunBrightnessSlider.value = ClimateModel.getSunBrightness();
+        albedoSlider.value = climateModel.getAlbedo();
+        sunBrightnessSlider.value = climateModel.getSunBrightness();
         speedSlider.value = 5;
       }
 
       addCO2Button.onclick = function() {
-        ClimateModel.addCO2();
+        climateModel.addCO2();
       }
 
       subtractCO2Button.onclick = function() {
-        ClimateModel.subtractCO2();
+        climateModel.subtractCO2();
       }
 
       addCloudsButton.onclick = function() {
-        ClimateModel.addCloud();
+        climateModel.addCloud();
       }
 
       subtractCloudsButton.onclick = function() {
-        ClimateModel.subtractCloud();
+        climateModel.subtractCloud();
       }
 
       followSunrayButton.onclick = function() {
-        ClimateModel.addSunraySpotlight();
+        climateModel.addSunraySpotlight();
       }
 
       followCO2Button.onclick = function() {
         if (this.textContent === "Follow CO2") {
-          ClimateModel.setSpotlight("CO2");
+          climateModel.setSpotlight("CO2");
           this.textContent = "Stop following";
         } else {
-          ClimateModel.removeSpotlight();
+          climateModel.removeSpotlight();
           this.textContent = "Follow CO2";
         }
       }
 
       hideButton.onclick = function() {
         if (this.textContent === "Hide 90% of elements") {
-          ClimateModel.hide90();
+          climateModel.hide90();
           this.textContent = "Show all elements";
         } else {
-          ClimateModel.showAll();
+          climateModel.showAll();
           this.textContent = "Hide 90% of elements";
         }
       }
 
       eruptButton.onclick = function() {
-        ClimateModel.erupt();
+        climateModel.erupt();
       }
 
       albedoSlider.onchange = function() {
-        ClimateModel.setAlbedo(+albedoSlider.value);
+        climateModel.setAlbedo(+albedoSlider.value);
       }
 
       sunBrightnessSlider.onchange = function() {
-        ClimateModel.setSunBrightness(+sunBrightnessSlider.value);
+        climateModel.setSunBrightness(+sunBrightnessSlider.value);
       }
 
       speedSlider.onchange = function() {
         // scale value, 0=10, 5=60, 10=500
         var val = speedSlider.value,
             frequency = val <= 5 ? (val * 10)+10 : (val-5)*88 + 60;
-        ClimateModel.setStepFrequency(frequency);
+        climateModel.setStepFrequency(frequency);
       }
 
       resetButton.onclick = function() {
         lastTick = 0;
         temperatureGraph.reset();
         co2Graph.reset();
-        ClimateModel.setup();
+        climateModel.setup();
       }
 
       playButton.onclick = function() {
-        ClimateModel.start();
+        climateModel.start();
       }
 
       stopButton.onclick = function() {
-        ClimateModel.stop();
+        climateModel.stop();
       }
 
       stepButton.onclick = function() {
-        ClimateModel.stop();
-        ClimateModel.animate();
+        climateModel.stop();
+        climateModel.animate();
         updateTickCounter();
       }
 
       function updateTickCounter() {
-        ticks = ClimateModel.ticks;
+        ticks = climateModel.ticks;
         tickCounter.textContent = ticks;
       }
 
@@ -732,14 +732,14 @@
       lastTick = 0;
 
       d3.timer(function(elapsed) {
-        if (typeof ClimateModel !== "undefined") {
-          var temperature = ClimateModel.getTemperature(),
-              co2Count = ClimateModel.getCO2Count(),
-              tick = ClimateModel.ticks,
+        if (typeof climateModel !== "undefined") {
+          var temperature = climateModel.getTemperature(),
+              co2Count = climateModel.getCO2Count(),
+              tick = climateModel.ticks,
               ticksElapsed = tick - lastTick;
           temperatureOutput.textContent = temperatureFormatter(temperature);
           co2Output.textContent = countFormatter(co2Count);
-          if (!ClimateModel.animStop && ticksElapsed) {
+          if (!climateModel.animStop && ticksElapsed) {
             while (ticksElapsed--) {  // duplicate data if multiple model steps passed
               temperatureGraph.addPoints([temperature]);
               co2Graph.addPoints([co2Count]);
