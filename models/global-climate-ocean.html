@@ -64,16 +64,16 @@
       runCO2: ->
         for a in @CO2()
           if a
-            speed = 0.1
             a.heading = a.heading + u.randomCentered(Math.PI/9)
             if a.y <= @oceanBottom                          # stop at bottom of ocean
-              speed = 0
+              a.stamp()
+              a.die()
             if a.y <= @earthTop + 1 and a.x < @oceanLeft    # bounce off land
               a.heading = u.randomFloat2(Math.PI/4, Math.PI*3/4)
             if a.y >= @skyTop + 1                           # bounce off sky
               a.heading = u.randomFloat2(-Math.PI/4, -Math.PI*3/4)
 
-            a.forward speed
+            a.forward 0.1
 
       emitCO2: ->
         # pick a random patch from the surface
