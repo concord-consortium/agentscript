@@ -452,7 +452,7 @@
 
       followCO2Button.onclick = function() {
         if (this.textContent === "Follow CO2") {
-          climateModel.setSpotlight("CO2");
+          climateModel.addCO2Spotlight();
           this.textContent = "Stop following";
         } else {
           climateModel.removeSpotlight();

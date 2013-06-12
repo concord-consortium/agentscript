@@ -130,6 +130,12 @@ class ClimateModel extends ABM.Model
         if a.y >= @skyTop + 1
           a.heading = u.randomFloat2(-Math.PI/4, -Math.PI*3/4)
 
+  addCO2Spotlight: ->
+    agents = @CO2().getWithProp "hidden", false
+    if agents.any()
+      a = agents.oneOf()
+      @setSpotlight a
+
   #
   # IR
   #
@@ -284,13 +290,16 @@ class ClimateModel extends ABM.Model
     # try to add spotlight to a sunray at very top heading downwards
     foundOne = false
     for a in @sunrays().shuffle()
-      if not @headingUp(a) and a.y > @patches.maxY-5
+      if not @headingUp(a) and a.y > @patches.maxY-5 and not a.hidden
         foundOne = true
         @setSpotlight a
         break
     if not foundOne
-      # if we did not find one, add spotlight to random sunray
-      @setSpotlight "sunrays"
+      # if we did not find one, add spotlight to random VISIBLE sunray
+      agents = @sunrays().getWithProp "hidden", false
+      if agents.any()
+        a = agents.oneOf()
+        @setSpotlight a
 
   #
   # Volcano
@@ -325,7 +334,7 @@ class ClimateModel extends ABM.Model
     @hiding90 = true
     for agentSet in [@sunrays(), @CO2(), @IR(), @heat()]
       for a in agentSet[Math.ceil(agentSet.length/10)..]
-        a.hidden = true
+        a.hidden = true unless a is @spotlightAgent
 
     # have to do clouds seperately
     @hide90Clouds()
