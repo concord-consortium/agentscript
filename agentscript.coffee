@@ -803,7 +803,7 @@ u = ABM.util
 # * x,y: the x,y position within the grid
 # * color: the color of the patch as an RGBA array, A optional.
 # * label: text for the patch
-# * n/n4: adjacent neighbors: n: 8 patches, n4: N,E,S,W patches.
+# * n/n4: adjacent neighbors: n: 8 patches [SW, S , SE, W, E, NW, N, NE], n4: 4 patches [S, W, E, N].
 class ABM.Patch
   # Class variable defaults, "promoted" to instance variables if needed
   # when unique per instance rather than shared.
@@ -897,7 +897,7 @@ class ABM.Patches extends ABM.AgentSet
   setNeighbors: -> 
     for p in @
       p.n =  @patchRect p, 1, 1 # p.n =  p.patchRect 1, 1
-      p.n4 = @asSet (n for n in p.n when n.x is p.x or n.y is p.y)
+      p.n4 = [ p.n[1], p.n[3], p.n[4], p.n[6] ]
 
   # Setup pixels used for `drawScaledPixels` and `importColors`
   setPixels: ->
@@ -979,7 +979,9 @@ class ABM.Patches extends ABM.AgentSet
           if not pnext?
             u.error "patchRect: x,y out of bounds, see console.log"
             console.log "  x #{x} y #{y} p.x #{p.x} p.y #{p.y} dx #{dx} dy #{dy} minX #{@minX} minY #{@minY}"
-          rect.push pnext if (meToo or p isnt pnext)
+        else
+          pnext = null
+        rect.push pnext if (meToo or p isnt pnext)
     @asSet rect
 
   # Draws, or "imports" an image URL into the drawing layer.
@@ -1504,7 +1506,7 @@ class ABM.Model
       spotlight: layers[4]
     # Set a variable in each context with its name
     v.agentSetName = k for k,v of @contexts
-
+    
     # Initialize agentsets.
     @patches = ABM.patches = \
       new ABM.Patches size,minX,maxX,minY,maxY,torus,neighbors
