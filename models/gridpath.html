@@ -4,8 +4,9 @@
     <script src="../agentscript.js"></script>
     <script src="../coffee-script.js"></script>
     <script type="text/coffeescript">
+
+    u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      u = ABM.util # utilities; static variable
       setup: -> # called by Model ctor
         @refreshAgents = false # for static agents
         
@@ -16,18 +17,23 @@
         @agents.setDefaultShape("circle")
         @agents.setDefaultColor([210,0,0])
         @agents.setDefaultSize(.4)
-        @agents.setDefaultPen(2.5, true)
+        @agents.setDefaultPen(2.5)
         @agents.setDefaultHeading(0) # override promotion to random angle
 
+        @anim.setRate 10
+
         for p in @patches
-          p.color = u.randomGray [], 160, 190
+          p.color = u.randomGray 160, 190
           p.occupied = false
         @drawGrid [0,0,0]
         @walker = @agents.create(1)[0]
+        p0 = @patches[0]
+        @walker.setXY p0.x, p0.y
+        @walker.penDown = true
         # @walker.color = [210,0,0]
         # @walker.shape = "circle"
         # @walker.size = .4
-        @walker.setXY 0, 0
+        # @walker.setXY 0, 0 # needed? should start at 0,0
         @walker.stamp()
         @walker.p.occupied = true
         # @walker.penDown = true
@@ -60,7 +66,7 @@
       
       floodFill: ->
         p.ok = false for p in @patches
-        pset = [@patches.last()]
+        pset = [@patches.last()] # [@patches.patchXY @patches.maxX, @patches.maxY] # [@patches.last()]
         while pset.length > 0
           p.ok = true for p in pset
           pnext = @asSet u.flatten (p.n4 for p in pset)
@@ -68,15 +74,15 @@
           pset = (n for n in pnext when not n.ok and not n.occupied)
         null
 
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, neighbors=true
+    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
     #   NL Defaults: 13, -16, 16, -16, 16
     APP=new MyModel "layers", 30, 0,10, 0,10, false
-    APP.setRootVars()
-    </script>
+    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
 
+    </script>
   </head>
   <body onload="ABM.model.start()">
-    <canvas id="testCanvas" style="height:0;width:0;">Your browser does not support HTML5 Canvas.</canvas>
-    <div id="layers"></div>
+    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
+    <div id="layers" style="position:relative;padding:20;"></div>
   </body>
 </html>

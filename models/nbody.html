@@ -5,8 +5,8 @@
     <script src="../coffee-script.js"></script>
     <script type="text/coffeescript">
     
+    u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      u = ABM.util # utilities; static variable
       setup: -> # called by Model ctor
         @refreshPatches = false # for static patches
         
@@ -22,7 +22,7 @@
 
         # window.foo = @patches.nOf(@population)
         for p in @patches.nOf(@population)
-          p.sprout 1, (a) =>
+          p.sprout 1, @agents, (a) =>
             if @sun and a.id is 0
               a.mass = 10000; a.setXY 0,0; a.vx = a.vy = 0
             else
@@ -47,17 +47,15 @@
           # a.setXY 0,0 if @sun and a.id is 0
         null
         
-
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, neighbors=true
+    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
     #   NL Defaults: 13, -16, 16, -16, 16
     APP=new MyModel "layers", 2, -120, 120, -100, 100, false, false
-    APP.setRootVars()
+    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
     
     </script>
-
   </head>
   <body onload="ABM.model.start()">
-    <canvas id="testCanvas" style="height:0;width:0;">Your browser does not support HTML5 Canvas.</canvas>
-    <div id="layers"></div>
+    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
+    <div id="layers" style="position:relative;padding:20;"></div>
   </body>
 </html>

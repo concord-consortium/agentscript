@@ -5,8 +5,8 @@
     <script src="../coffee-script.js"></script>
     <script type="text/coffeescript">
 
+    u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      u = ABM.util # utilities; static variable
       setup: -> # called by Model ctor
         @refreshPatches = false # for static patches
         @refreshLinks = false # for static links .. drown as created
@@ -38,11 +38,11 @@
         c = u.minOneOf(g, "id").color
         node.color = c for node in g
         if g.length > @cluster
-          console.log "New largest cluster: size: #{g.length} tick: #{@ticks}"
+          console.log "New largest cluster: size: #{g.length} tick: #{@anim.ticks}"
         @cluster = Math.max @cluster, g.length
         
         if @cluster is @buttons
-          console.log "Completed at tick #{@ticks}:  Cluster size #{@cluster} Links: #{@links.length}"
+          console.log "Completed at tick #{@anim.ticks}:  Cluster size #{@cluster} Links: #{@links.length}"
           @stop()
         
       graphOf: (node) ->
@@ -55,15 +55,15 @@
         @markNeighbors n for n in unMarked
 
 
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, neighbors=true
+    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
     #   NL Defaults: 13, -16, 16, -16, 16
     APP=new MyModel "layers", 13, -16, 16, -16, 16, false, false
-    APP.setRootVars()
-    </script>
+    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
 
+    </script>
   </head>
   <body onload="ABM.model.start()">
-    <canvas id="testCanvas" style="height:0;width:0;">Your browser does not support HTML5 Canvas.</canvas>
-    <div id="layers"></div>
+    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
+    <div id="layers" style="position:relative;padding:20;"></div>
   </body>
 </html>

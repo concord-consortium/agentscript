@@ -4,16 +4,19 @@
     <script src="../agentscript.js"></script>
     <script src="../coffee-script.js"></script>
     <script type="text/coffeescript">
+
+    u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      u = ABM.util # static variable
       setup: -> # called by Model ctor
         
         # No optimizations: 10fps
-        @setFastPatches() # 24fps
-        # @setCacheAgentsHere() # 9-10fps, not needed & modest overhead
-        @setAgentStaticColors() # 10fps, not large part of performance
+        @patches.usePixels() # 24fps
+        # @patches.cacheAgentsHere() # 9-10fps, not needed & modest overhead
         # two: 27fps, now static colors larger percent of faster patches.
-        @setAgentsUseSprites() # 24->46-48fps!
+        @agents.setUseSprites() # 24->46-48fps!
+        
+        # @anim.setRate 25, true # normal: let agents step faster than drawing
+        @anim.setRate 60, false # speed test
         
         # globals
         @nestColor = [255,255,0]  # yellow
@@ -32,12 +35,15 @@
         @wiggleAngle = u.degToRad(30) # radians
 
         if @agents.useSprites
-          @nestSprite = ABM.shapes.shapeToCtx "bug", @nestColor, 3*@patches.size
-          @foodSprite = ABM.shapes.shapeToCtx "bug", @foodColor, 3*@patches.size
+          # @nestSprite = ABM.shapes.shapeToSprite "bug", @nestColor, 3*@patches.size
+          # @foodSprite = ABM.shapes.shapeToSprite "bug", @foodColor, 3*@patches.size
+          @nestSprite = ABM.shapes.shapeToSprite "bug", @nestColor, @patches.toBits 3
+          @foodSprite = ABM.shapes.shapeToSprite "bug", @foodColor, @patches.toBits 3
         
         @setupPatches()
         @setupAgents()
       step: ->
+        console.log @anim.toString() if @anim.ticks % 100 is 0
         @updateAgents()
         @updatePatches()
 
@@ -59,14 +65,14 @@
         a.carryingFood = withFood
         if @agents.useSprites
           a.sprite = if withFood then @nestSprite else @foodSprite
+          # a.setSprite (if withFood then @nestSprite else @foodSprite)
         else
           a.color = if withFood then @nestColor else @foodColor
-          a.colorStr = u.colorStr a.color if @agents.staticColors
+          # a.colorStr = u.colorStr a.color if @agents.staticColors
         a.pheromone = @maxPheromone
 
       updateAgents: ->
-        for a in @agents
-          if a.id < @ticks # gradually leave nest
+        for a in @agents when a.id < @anim.ticks # gradually leave nest
             @wiggleUphill a
             @dropPheromone a
         null # needed to avoid returning an absurd comprehension
@@ -113,14 +119,15 @@
       patchRect: (x, y, dw, dh) ->
         @patches.patchRect @patches.patch(x,y), dw, dh, true
 
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, neighbors=true
+    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
     #   NL Defaults: 13, -16, 16, -16, 16
     APP=new MyModel "layers", 6, -40, 40, -40, 40, false
+    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
     </script>
 
   </head>
   <body onload="ABM.model.start()">
-    <canvas id="testCanvas" style="height:0;width:0;">Your browser does not support HTML5 Canvas.</canvas>
-    <div id="layers"></div>
+    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
+    <div id="layers" style="position:relative;padding:20;"></div>
   </body>
 </html>
