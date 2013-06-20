@@ -1155,6 +1155,14 @@ class ABM.Patches extends ABM.AgentSet
     y = u.clamp Math.round(y), @minY, @maxY
     @patchXY x, y
 
+  # Return the patch at the pixel location indicated.
+  # x/y are screen coordinates (ie 0,0 is top left of the canvas, and values
+  # increase positively downward and to the right).
+  patchAtPixel: (x,y)->
+    x = Math.floor(x/@size) + @minX
+    y = @maxY - Math.floor(y/@size)
+    return @patchXY x, y
+
   # Return a random valid float x,y point in patch space
   randomPt: -> [u.randomFloat2(@minX-.5,@maxX+.5), u.randomFloat2(@minY-.5,@maxY+.5)]
 

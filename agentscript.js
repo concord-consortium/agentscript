@@ -1604,6 +1604,12 @@
       return this.patchXY(x, y);
     };
 
+    Patches.prototype.patchAtPixel = function(x, y) {
+      x = Math.floor(x / this.size) + this.minX;
+      y = this.maxY - Math.floor(y / this.size);
+      return this.patchXY(x, y);
+    };
+
     Patches.prototype.randomPt = function() {
       return [u.randomFloat2(this.minX - .5, this.maxX + .5), u.randomFloat2(this.minY - .5, this.maxY + .5)];
     };
