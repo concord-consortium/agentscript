@@ -709,11 +709,11 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  drawScaledPixels: (ctx) -&gt;
+            <div class="content"><div class='highlight'><pre>  drawScaledPixels: (ctx, pSet=@) -&gt;
     <span class="keyword">if</span> <span class="property">@pixelsData32</span>?
-      <span class="property">@drawScaledPixels32</span> ctx
+      <span class="property">@drawScaledPixels32</span> ctx, pSet
     <span class="keyword">else</span>
-      <span class="property">@drawScaledPixels8</span> ctx</pre></div></div>
+      <span class="property">@drawScaledPixels8</span> ctx, pSet</pre></div></div>
             
         </li>
         
@@ -728,9 +728,9 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  drawScaledPixels8: (ctx) -&gt;
+            <div class="content"><div class='highlight'><pre>  drawScaledPixels8: (ctx, pSet) -&gt;
     data = <span class="property">@pixelsData</span>
-    <span class="keyword">for</span> p <span class="keyword">in</span> @
+    <span class="keyword">for</span> p <span class="keyword">in</span> pSet
       i = <span class="property">@pixelByteIndex</span> p
       c = p.color
       data[i+j] = c[j] <span class="keyword">for</span> j <span class="keyword">in</span> [<span class="number">0.</span><span class="number">.2</span>]
@@ -752,9 +752,9 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  drawScaledPixels32: (ctx) -&gt;
+            <div class="content"><div class='highlight'><pre>  drawScaledPixels32: (ctx, pSet) -&gt;
     data = <span class="property">@pixelsData32</span>
-    <span class="keyword">for</span> p <span class="keyword">in</span> @
+    <span class="keyword">for</span> p <span class="keyword">in</span> pSet
       i = <span class="property">@pixelWordIndex</span> p
       c = p.color
       a = <span class="keyword">if</span> c.length <span class="keyword">is</span> <span class="number">4</span> <span class="keyword">then</span> c[<span class="number">3</span>] <span class="keyword">else</span> <span class="number">255</span>

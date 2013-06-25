@@ -1717,19 +1717,22 @@
       });
     };
 
-    Patches.prototype.drawScaledPixels = function(ctx) {
+    Patches.prototype.drawScaledPixels = function(ctx, pSet) {
+      if (pSet == null) {
+        pSet = this;
+      }
       if (this.pixelsData32 != null) {
-        return this.drawScaledPixels32(ctx);
+        return this.drawScaledPixels32(ctx, pSet);
       } else {
-        return this.drawScaledPixels8(ctx);
+        return this.drawScaledPixels8(ctx, pSet);
       }
     };
 
-    Patches.prototype.drawScaledPixels8 = function(ctx) {
+    Patches.prototype.drawScaledPixels8 = function(ctx, pSet) {
       var c, data, i, j, p, _i, _j, _len;
       data = this.pixelsData;
-      for (_i = 0, _len = this.length; _i < _len; _i++) {
-        p = this[_i];
+      for (_i = 0, _len = pSet.length; _i < _len; _i++) {
+        p = pSet[_i];
         i = this.pixelByteIndex(p);
         c = p.color;
         for (j = _j = 0; _j <= 2; j = ++_j) {
@@ -1744,11 +1747,11 @@
       return ctx.drawImage(this.pixelsCtx.canvas, 0, 0, ctx.canvas.width, ctx.canvas.height);
     };
 
-    Patches.prototype.drawScaledPixels32 = function(ctx) {
+    Patches.prototype.drawScaledPixels32 = function(ctx, pSet) {
       var a, c, data, i, p, _i, _len;
       data = this.pixelsData32;
-      for (_i = 0, _len = this.length; _i < _len; _i++) {
-        p = this[_i];
+      for (_i = 0, _len = pSet.length; _i < _len; _i++) {
+        p = pSet[_i];
         i = this.pixelWordIndex(p);
         c = p.color;
         a = c.length === 4 ? c[3] : 255;

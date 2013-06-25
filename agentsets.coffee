@@ -255,15 +255,15 @@ class ABM.Patches extends ABM.AgentSet
 
   # Draw the patches via pixel manipulation rather than 2D drawRect.
   # See Mozilla pixel [manipulation article](http://goo.gl/Lxliq)
-  drawScaledPixels: (ctx) ->
+  drawScaledPixels: (ctx, pSet=@) ->
     if @pixelsData32?
-      @drawScaledPixels32 ctx
+      @drawScaledPixels32 ctx, pSet
     else
-      @drawScaledPixels8 ctx
+      @drawScaledPixels8 ctx, pSet
   # The 8-bit version for drawScaledPixels.  Used for systems w/o typed arrays
-  drawScaledPixels8: (ctx) ->
+  drawScaledPixels8: (ctx, pSet) ->
     data = @pixelsData
-    for p in @
+    for p in pSet
       i = @pixelByteIndex p
       c = p.color
       data[i+j] = c[j] for j in [0..2]
@@ -272,9 +272,9 @@ class ABM.Patches extends ABM.AgentSet
     return if @size is 1
     ctx.drawImage @pixelsCtx.canvas, 0, 0, ctx.canvas.width, ctx.canvas.height
   # The 32-bit version of drawScaledPixels, with both little and big endian hardware.
-  drawScaledPixels32: (ctx) ->
+  drawScaledPixels32: (ctx, pSet) ->
     data = @pixelsData32
-    for p in @
+    for p in pSet
       i = @pixelWordIndex p
       c = p.color
       a = if c.length is 4 then c[3] else 255
