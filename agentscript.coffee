@@ -571,10 +571,12 @@ ABM.shapes = ABM.util.s = do ->
     rotate: false
     draw: (c) -> circ c,0,0,1; c.closePath(); ccirc c,0,0,.6
   cup: # an image shape, using coffeescript logo
-    shortcut: (c,x,y,s) -> cimg c,x,y,s,@img
+    shortcut: (c,x,y,s) -> cimg c,x,y,s,@img()
     rotate: false
-    img: u.importImage "http://goo.gl/LTIyR"
-    draw: (c) -> cimg c,.5,.5,1,@img
+    imgCache: null
+    img: ->
+      if @imgCache then @imageCache else @imageCache = u.importImage "http://goo.gl/LTIyR"
+    draw: (c) -> cimg c,.5,.5,1,@img()
   person:
     rotate: false
     draw: (c) ->

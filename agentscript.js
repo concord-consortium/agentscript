@@ -864,12 +864,19 @@
       },
       cup: {
         shortcut: function(c, x, y, s) {
-          return cimg(c, x, y, s, this.img);
+          return cimg(c, x, y, s, this.img());
         },
         rotate: false,
-        img: u.importImage("http://goo.gl/LTIyR"),
+        imgCache: null,
+        img: function() {
+          if (this.imgCache) {
+            return this.imageCache;
+          } else {
+            return this.imageCache = u.importImage("http://goo.gl/LTIyR");
+          }
+        },
         draw: function(c) {
-          return cimg(c, .5, .5, 1, this.img);
+          return cimg(c, .5, .5, 1, this.img());
         }
       },
       person: {
