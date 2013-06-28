@@ -1029,6 +1029,9 @@ class ABM.Patch
   draw: (ctx) ->
     ctx.fillStyle = u.colorStr @color
     ctx.fillRect @x-.5, @y-.5, 1, 1
+    @drawLabel(ctx)
+
+  drawLabel: (ctx)->
     if @label? # REMIND: should be 2nd pass.
       [x,y] = ctx.labelXY
       ctx.save() # bug: fonts don't scale for size < 1

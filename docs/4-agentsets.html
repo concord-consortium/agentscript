@@ -175,6 +175,9 @@ p.scaleColor @foodColor, p.foodPheromone # ants model</code></pre>
             <div class="content"><div class='highlight'><pre>  draw: (ctx) -&gt;
     ctx.fillStyle = u.colorStr <span class="property">@color</span>
     ctx.fillRect <span class="property">@x</span>-<span class="number">.5</span>, <span class="property">@y</span>-<span class="number">.5</span>, <span class="number">1</span>, <span class="number">1</span>
+    <span class="property">@drawLabel</span>(ctx)
+
+  drawLabel: (ctx)-&gt;
     <span class="keyword">if</span> <span class="property">@label</span>? <span class="comment"># REMIND: should be 2nd pass.</span>
       [x,y] = ctx.labelXY
       ctx.save() <span class="comment"># bug: fonts don't scale for size &lt; 1</span>

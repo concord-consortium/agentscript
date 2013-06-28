@@ -1422,9 +1422,13 @@
     };
 
     Patch.prototype.draw = function(ctx) {
-      var x, y, _ref;
       ctx.fillStyle = u.colorStr(this.color);
       ctx.fillRect(this.x - .5, this.y - .5, 1, 1);
+      return this.drawLabel(ctx);
+    };
+
+    Patch.prototype.drawLabel = function(ctx) {
+      var x, y, _ref;
       if (this.label != null) {
         _ref = ctx.labelXY, x = _ref[0], y = _ref[1];
         ctx.save();
