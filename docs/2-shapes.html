@@ -205,7 +205,7 @@ Useful for shortcuts</p>
   pyramid:
     rotate: <span class="literal">false</span>
     draw: (c) -&gt; poly c, [[<span class="number">0</span>,<span class="number">.5</span>],[-<span class="number">.433</span>,-<span class="number">.25</span>],[<span class="number">.433</span>,-<span class="number">.25</span>]]
-  circle:
+  circle: <span class="comment"># Note: NetLogo's dot is simply circle with a small size</span>
     shortcut: (c,x,y,s) -&gt; c.beginPath(); circ c,x,y,s; c.closePath(); c.fill()
     rotate: <span class="literal">false</span>
     draw: (c) -&gt; circ c,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span> <span class="comment"># c.arc 0,0,.5,0,2*Math.PI</span>
@@ -219,13 +219,6 @@ Useful for shortcuts</p>
   ring:
     rotate: <span class="literal">false</span>
     draw: (c) -&gt; circ c,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>; c.closePath(); ccirc c,<span class="number">0</span>,<span class="number">0</span>,<span class="number">.6</span>
-  cup: <span class="comment"># an image shape, using coffeescript logo</span>
-    shortcut: (c,x,y,s) -&gt; cimg c,x,y,s,<span class="property">@img</span>()
-    rotate: <span class="literal">false</span>
-    imgCache: <span class="literal">null</span>
-    img: -&gt;
-      <span class="keyword">if</span> <span class="property">@imgCache</span> <span class="keyword">then</span> <span class="property">@imageCache</span> <span class="keyword">else</span> <span class="property">@imageCache</span> = u.importImage <span class="string">"http://goo.gl/LTIyR"</span>
-    draw: (c) -&gt; cimg c,<span class="number">.5</span>,<span class="number">.5</span>,<span class="number">1</span>,<span class="property">@img</span>()
   person:
     rotate: <span class="literal">false</span>
     draw: (c) -&gt;
@@ -267,7 +260,7 @@ Useful for shortcuts</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  add: (name, rotate, draw, shortcut) -&gt;
+            <div class="content"><div class='highlight'><pre>  add: (name, rotate, draw, shortcut) -&gt; <span class="comment"># draw can be an image, shortcut defaults to null</span>
     s = @[name] =
       <span class="keyword">if</span> u.isFunction draw <span class="keyword">then</span> {rotate,draw} <span class="keyword">else</span> {rotate,img:draw,draw:(c)-&gt;cimg c,<span class="number">.5</span>,<span class="number">.5</span>,<span class="number">1</span>,<span class="property">@img</span>}
     (s.<span class="function"><span class="title">shortcut</span></span> = (c,x,y,s) -&gt; cimg c,x,y,s,<span class="property">@img</span>) <span class="keyword">if</span> s.img? <span class="keyword">and</span> <span class="keyword">not</span> s.rotate
@@ -304,7 +297,7 @@ Useful for shortcuts</p>
             
             <div class="content"><div class='highlight'><pre>  draw: (ctx, shape, x, y, size, rad, color) -&gt;
     <span class="keyword">if</span> shape.shortcut?
-      ctx.fillStyle = u.colorStr color <span class="keyword">if</span> <span class="keyword">not</span> shape.img?
+      ctx.fillStyle = u.colorStr color <span class="keyword">unless</span> shape.img?
       shape.shortcut ctx,x,y,size
     <span class="keyword">else</span>
       ctx.save()
@@ -363,7 +356,7 @@ the shape to fit it. Return existing sprite if duplicate.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> <span class="keyword">not</span> ctx?
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">unless</span> ctx?
       spriteSheets[bits] = ctx = u.createCtx bits*<span class="number">10</span>, bits
       ctx.nextX = <span class="number">0</span>; ctx.nextY = <span class="number">0</span>; ctx.index = {}</pre></div></div>
             

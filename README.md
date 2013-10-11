@@ -1,25 +1,16 @@
 ### AgentScript
 
 AgentScript is a minimalist Agent Based Modeling (ABM) framework based on [NetLogo](http://ccl.northwestern.edu/netlogo/) (NL) agent semantics.  Its goal is to promote the Agent Oriented Programming model in a highly deployable [CoffeeScript](http://coffeescript.org/)/JavaScript (CS/JS) implementation.
+Please drop by our 
+[Google Group](https://groups.google.com/forum/?hl=en#!forum/agentscript)
 
 #### Build
 
-Currently we use a very simple build process using the coffeescript -wj
-command which "joins" the individual coffeescript files, compiling
-them on change, creating agentscript.js.
-
-    files="\
-      util.coffee \
-      shapes.coffee \
-      agentset.coffee \
-      agentsets.coffee \
-      model.coffee \
-    "
-    coffee -wj agentscript.js -c $files &
+Cake is used to build agentscript.coffee from individual source files, and to compile into agentscript.js, agentscript.min.js, and agentscript.map.  The map file allows debugging in Chrome via CS source.
 
 See the template.html and models/*.html files for example models.  The individual
 .coffee files are documented via Jeremy Ashkenas's
-[docco](http://jashkenas.github.com/docco/) in the docs/ dir using the method suggested [here](https://github.com/jashkenas/coffee-script/wiki/[HowTo]-Compiling-and-Setting-Up-Build-Tools).
+[docco](http://jashkenas.github.com/docco/) in the docs/ dir. See the Cakefile for details.
 
 #### Documentation
 
@@ -35,7 +26,17 @@ Currently the documentation is hosted directly on github via the [rawgithub](htt
 
 [**model.coffee**](https://rawgithub.com/backspaces/agentscript/master/docs/5-model.html) is the top level integration for all the agentsets and is subclassed by all user models. 
 
-[**template.html**](https://rawgithub.com/backspaces/agentscript/master/docs/6-template.html) is a trivial subclass of Model showing the basic structure how you build your own models.  In addition, the models/ directory contains 10 simple models used in teaching NetLogo. You can [run the model here.](https://rawgithub.com/backspaces/agentscript/master/template.html) 
+[**template.html**](https://rawgithub.com/backspaces/agentscript/master/docs/6-template.html) is a trivial subclass of Model showing the basic structure how you build your own models.  In addition, the models/ directory contains 10 simple models used in teaching NetLogo. You can [run the model here.](https://rawgithub.com/backspaces/agentscript/master/models/template.html) 
+
+#### Add-ons
+
+The extras/ directory contains libraries that are too specialized to be in the core AgentScript but are essential for certain applications.  They are compiled to JS in the lib/ directory.
+
+[**data.coffee**](https://rawgithub.com/backspaces/agentscript/master/docs/data.html) A 2D DataSet library for data best expressed as an array of numbers.  It includes the ability to treat Images as data, to parse GIS elevation .asc files, to create datasets from patch variables etc.  It includes analytic abilities like nearest neighbor and bilinear sampling, convolution with 3x3 kernels, and resampling datasets to different resolutions.
+
+[**fbui.coffee**](https://rawgithub.com/backspaces/agentscript/master/docs/fbui.html) A simple start at a User Interface abstraction, with JSON representing buttons, sliders, switches and menus.  Each item in the JSON tree modifies the state of the model, either directly by setting Model variables or indirectly by calling a method in class Model.
+
+[**mouse.coffee**](https://rawgithub.com/backspaces/agentscript/master/docs/mouse.html) A trivial event based interface to the mouse, mainly for direct interaction with the model's graphic layers.  It converts the mouse raw coordinates into patch coordinates.
 
 #### Sample Models
 
@@ -73,42 +74,31 @@ Our example models use CoffeeScript directly within the browser via `text/coffee
         <script type="text/coffeescript">
         class MyModel extends ABM.Model
               ...
-        APP=new MyModel "layers", 13, -16, 16, -16, 16
+        model = new MyModel "layers", 13, -16, 16, -16, 16
               ...
         </script>
       </head>
-      <body onload="ABM.model.start()">
-        <div id="layers" style="position:relative;padding:20;"></div>
+      <body>
+        <div id="layers" style="padding:20"></div>
       </body>
     </html>
 
-You may see this by running a sample model, then use the browser's View Page Source.  (Google "view page source `<`my browser`>`")
+You may see this by running a sample model, then use the browser's View Page Source.  (Google "view page source")
 
-Similarly, the models will print to the "javascript console" while they run. (Google "view javascript console `<`my browser`>`")
+Similarly, the models will print to the "javascript console" while they run. (Google "view javascript console")
 
 #### Files
-
+    
+    Cakefile            cake file for build, docs etc.
     LICENSE             GPLv3 License
     README.md           This file
-    agentscript.coffee  Join of core .coffee files
-    agentscript.js      Coffeescript generated files
-    agentscript.min.js  Uglified agentscript.js
-    agentscript.sh      Script for uglify etc
-    agentset.coffee     Base agentset implementation
-    agentsets.coffee    Subclasses of agentset for Agents, Patches, Links
-    coffee-script.js    Coffeescript.org browser compiler
-    doc.sh              Script to generate docco documentation
-    docs                Dir for docco documentation
-    model.coffee        Base model class
-    models              Dir for example models
-    nlmodels            Dir for example NL models
-    nlwebgl             Dir for webgl diffusion experiment
-    shapes.coffee       Core shapes module
-    template.html       Sample model
-    testmodels          Tests of CS/NL semantics
-    util.coffee         Base utility model
-    watch.sh            Coffeescript "watch" script
-
+    docs/               Docco documentation
+    extras/             AgentScript extensions
+    lib/                All .js/min.js and .map files
+    models/             Sample models
+    src/                Component .coffee files for agentscript.coffee
+    tools/              coffee-script.js and others
+    
 #### License
 
 Copyright Owen Densmore, RedfishGroup LLC, 2012, 2013<br>

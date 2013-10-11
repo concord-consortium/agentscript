@@ -1,13 +1,13 @@
 <html>
   <head>
     <title>AgentScript Model</title>
-    <script src="../agentscript.js"></script>
-    <script src="../coffee-script.js"></script>
+    <script src="../lib/agentscript.js"></script>
+    <script src="../tools/coffee-script.js"></script>
     <script type="text/coffeescript">
     
     u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      setup: -> # called by Model ctor
+      setup: ->
         @refreshPatches = false # for static patches
         
         # globals
@@ -16,8 +16,8 @@
         @stopTick = 400
         
         # defaults
-        @agents.setDefaultShape "circle"
-        @links.setDefaultThickness .75 # Easier to see thiner link
+        @agents.setDefault "shape", "circle"
+        @links.setDefault "thickness", .75 # Easier to see thiner link
         
         @agents.create 1; @makeNode @agents[0]
       step: ->
@@ -35,15 +35,15 @@
       findPartner: ->
         u.oneOf @links.oneOf().bothEnds() # or @links.allEnds().oneOf()
 
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
-    #   NL Defaults: 13, -16, 16, -16, 16
-    APP=new MyModel "layers", 5, -45, 45, -45, 45, false, false
-    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
+    # div, patchSize, minX, maxX, minY, maxY, isTorus, hasNeighbors
+    #   Defaults: 13, -16, 16, -16, 16, false, true
+    model = new MyModel "layers", 5, -45, 45, -45, 45, false, false
+    model.debug() # Debug: Put Model vars in global name space
+    model.start() # Run model immediately after startup initialization
 
     </script>
   </head>
-  <body onload="ABM.model.start()">
-    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
-    <div id="layers" style="position:relative;padding:20;"></div>
+  <body>
+    <div id="layers" style="padding:20"></div>
   </body>
 </html>

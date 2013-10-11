@@ -109,13 +109,13 @@ for customization by the programmer.  See these URLs for more info:</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>Create initial animator for the model, specifying default rate (fps) and multiStep (async).
-If multiStep, run the draw() and step() methods asynchronously by draw() using
+              <p>Create initial animator for the model, specifying default rate (fps) and multiStep.
+If multiStep, run the draw() and step() methods separately by draw() using
 requestAnimFrame and step() using setTimeout.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  constructor: (<span class="property">@model</span>, <span class="property">@rate</span>=<span class="number">30</span>, <span class="property">@multiStep</span>=<span class="literal">false</span>) -&gt; <span class="property">@reset</span>() <span class="comment"># init all animation state</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  constructor: (<span class="property">@model</span>, <span class="property">@rate</span>=<span class="number">30</span>, <span class="property">@multiStep</span>=<span class="literal">false</span>) -&gt; <span class="property">@reset</span>()</pre></div></div>
             
         </li>
         
@@ -126,12 +126,12 @@ requestAnimFrame and step() using setTimeout.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <p>Adjust animator.  This is used by programmer as the default animator will already have
-been created by the time her model runs.</p>
+              <p>Adjust animator.  Call before model.start()
+in setup() to change default settings</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setRate: (<span class="property">@rate</span>, <span class="property">@multiStep</span>=<span class="literal">false</span>) -&gt; <span class="property">@resetAnim</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  setRate: (<span class="property">@rate</span>, <span class="property">@multiStep</span>=<span class="literal">false</span>) -&gt; <span class="property">@resetTimes</span>() <span class="comment"># Change rate while running?</span></pre></div></div>
             
         </li>
         
@@ -142,26 +142,21 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <p>start/stop model, often used for debugging</p>
+              <p>start/stop model, often used for debugging and resetting model</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  start: -&gt;
-    <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@animStop</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="comment"># avoid multiple animates</span>
-    <span class="property">@resetAnim</span>()
-    <span class="property">@animStop</span> = <span class="literal">false</span>
+    <span class="keyword">return</span> <span class="keyword">unless</span> <span class="property">@stopped</span> <span class="comment"># avoid multiple animates</span>
+    <span class="property">@resetTimes</span>()
+    <span class="property">@stopped</span> = <span class="literal">false</span>
     <span class="property">@animate</span>()
-  resetAnim: -&gt;
-    <span class="property">@startMS</span> = <span class="property">@now</span>()
-    <span class="property">@startTick</span> = <span class="property">@ticks</span>
-    <span class="property">@startDraw</span> = <span class="property">@draws</span>
   stop: -&gt;
-    <span class="property">@animStop</span> = <span class="literal">true</span>
+    <span class="property">@stopped</span> = <span class="literal">true</span>
     <span class="keyword">if</span> <span class="property">@animHandle</span>? <span class="keyword">then</span> cancelAnimFrame <span class="property">@animHandle</span>
     <span class="keyword">if</span> <span class="property">@timeoutHandle</span>? <span class="keyword">then</span> clearTimeout <span class="property">@timeoutHandle</span>
     <span class="keyword">if</span> <span class="property">@intervalHandle</span>? <span class="keyword">then</span> clearInterval <span class="property">@intervalHandle</span>
-    <span class="property">@animHandle</span> = <span class="property">@timerHandle</span> = <span class="property">@intervalHandle</span> = <span class="literal">null</span>
-  reset: -&gt; <span class="property">@stop</span>(); <span class="property">@ticks</span> = <span class="property">@draws</span> = <span class="number">0</span></pre></div></div>
+    <span class="property">@animHandle</span> = <span class="property">@timerHandle</span> = <span class="property">@intervalHandle</span> = <span class="literal">null</span></pre></div></div>
             
         </li>
         
@@ -172,12 +167,14 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p>step/draw the model.  Note ticks/draws counters separate due to async.</p>
+              <p>Internal util: reset time instance variables</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  step: -&gt; <span class="property">@ticks</span>++; <span class="property">@model</span>.step()
-  draw: -&gt; <span class="property">@draws</span>++; <span class="property">@model</span>.draw()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  resetTimes: -&gt;
+    <span class="property">@startMS</span> = <span class="property">@now</span>()
+    <span class="property">@startTick</span> = <span class="property">@ticks</span>
+    <span class="property">@startDraw</span> = <span class="property">@draws</span></pre></div></div>
             
         </li>
         
@@ -188,11 +185,11 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <p>step and draw the model once, mainly debugging</p>
+              <p>Reset used by model.reset when resetting model.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  once: -&gt; <span class="property">@step</span>(); <span class="property">@draw</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  reset: -&gt; <span class="property">@stop</span>(); <span class="property">@ticks</span> = <span class="property">@draws</span> = <span class="number">0</span></pre></div></div>
             
         </li>
         
@@ -203,11 +200,12 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <p>Get current time, with high resolution timer if available</p>
+              <p>Two handlers used by animation loop</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  now: -&gt; (performance ? Date).now()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  step: -&gt; <span class="property">@ticks</span>++; <span class="property">@model</span>.step()
+  draw: -&gt; <span class="property">@draws</span>++; <span class="property">@model</span>.draw()</pre></div></div>
             
         </li>
         
@@ -218,11 +216,11 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Time in ms since starting animator</p>
+              <p>step and draw the model once, mainly debugging</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  ms: -&gt; <span class="property">@now</span>()-<span class="property">@startMS</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  once: -&gt; <span class="property">@step</span>(); <span class="property">@draw</span>()</pre></div></div>
             
         </li>
         
@@ -233,12 +231,11 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Get the number of ticks/draws per second.  They will differ if async</p>
+              <p>Get current time, with high resolution timer if available</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  ticksPerSec: -&gt; <span class="keyword">if</span> (elapsed = <span class="property">@ticks</span>-<span class="property">@startTick</span>) <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">then</span> <span class="number">0</span> <span class="keyword">else</span> Math.round elapsed*<span class="number">1000</span>/<span class="property">@ms</span>()
-  drawsPerSec: -&gt; <span class="keyword">if</span> (elapsed = <span class="property">@draws</span>-<span class="property">@startDraw</span>) <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">then</span> <span class="number">0</span> <span class="keyword">else</span> Math.round elapsed*<span class="number">1000</span>/<span class="property">@ms</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  now: -&gt; (performance ? Date).now()</pre></div></div>
             
         </li>
         
@@ -249,11 +246,11 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Return a status string for debugging and logging performance</p>
+              <p>Time in ms since starting animator</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  toString: -&gt; <span class="string">"ticks: <span class="subst">#{@ticks}</span>, draws: <span class="subst">#{@draws}</span>, rate: <span class="subst">#{@rate}</span> <span class="subst">#{@ticksPerSec()}</span>/<span class="subst">#{@drawsPerSec()}</span>"</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  ms: -&gt; <span class="property">@now</span>()-<span class="property">@startMS</span></pre></div></div>
             
         </li>
         
@@ -264,22 +261,13 @@ been created by the time her model runs.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Animation via setTimeout and requestAnimFrame</p>
+              <p>Get ticks/draws per second. They will differ if multiStep.
+The &quot;if&quot; is to avoid from ms=0</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  animateSteps: =&gt;
-    <span class="property">@step</span>()
-    <span class="property">@timeoutHandle</span> = setTimeout <span class="property">@animateSteps</span>, <span class="number">10</span> <span class="keyword">unless</span> <span class="property">@animStop</span>
-  animateDraws: =&gt;
-    <span class="keyword">if</span> <span class="property">@drawsPerSec</span>() &lt;= <span class="property">@rate</span>
-      <span class="property">@step</span>() <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@multiStep</span>
-      <span class="property">@draw</span>()
-    <span class="property">@animHandle</span> = requestAnimFrame <span class="property">@animateDraws</span> <span class="keyword">unless</span> <span class="property">@animStop</span>
-  animate: -&gt;
-    <span class="keyword">if</span> <span class="property">@multiStep</span>
-      <span class="property">@animateSteps</span>()
-    <span class="property">@animateDraws</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  ticksPerSec: -&gt; <span class="keyword">if</span> (elapsed = <span class="property">@ticks</span>-<span class="property">@startTick</span>) <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">then</span> <span class="number">0</span> <span class="keyword">else</span> Math.round elapsed*<span class="number">1000</span>/<span class="property">@ms</span>()
+  drawsPerSec: -&gt; <span class="keyword">if</span> (elapsed = <span class="property">@draws</span>-<span class="property">@startDraw</span>) <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">then</span> <span class="number">0</span> <span class="keyword">else</span> Math.round elapsed*<span class="number">1000</span>/<span class="property">@ms</span>()</pre></div></div>
             
         </li>
         
@@ -287,14 +275,14 @@ been created by the time her model runs.</p>
         <li id="section-13">
             <div class="annotation">
               
-              <div class="pilwrap for-h3">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <h3>Class Model</h3>
+              <p>Return a status string for debugging and logging performance</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="class"><span class="keyword">class</span> <span class="title">ABM</span>.<span class="title">Model</span>  </span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  toString: -&gt; <span class="string">"ticks: <span class="subst">#{@ticks}</span>, draws: <span class="subst">#{@draws}</span>, rate: <span class="subst">#{@rate}</span> <span class="subst">#{@ticksPerSec()}</span>/<span class="subst">#{@drawsPerSec()}</span>"</span></pre></div></div>
             
         </li>
         
@@ -304,6 +292,47 @@ been created by the time her model runs.</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Animation via setTimeout and requestAnimFrame</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  animateSteps: =&gt;
+    <span class="property">@step</span>()
+    <span class="property">@timeoutHandle</span> = setTimeout <span class="property">@animateSteps</span>, <span class="number">10</span> <span class="keyword">unless</span> <span class="property">@stopped</span>
+  animateDraws: =&gt;
+    <span class="keyword">if</span> <span class="property">@drawsPerSec</span>() &lt;= <span class="property">@rate</span>
+      <span class="property">@step</span>() <span class="keyword">unless</span> <span class="property">@multiStep</span>
+      <span class="property">@draw</span>()
+    <span class="property">@animHandle</span> = requestAnimFrame <span class="property">@animateDraws</span> <span class="keyword">unless</span> <span class="property">@stopped</span>
+  animate: -&gt;
+    <span class="property">@animateSteps</span>() <span class="keyword">if</span> <span class="property">@multiStep</span>
+    <span class="property">@animateDraws</span>()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <h3>Class Model</h3>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>ABM.models = {} <span class="comment"># user space, put your models here</span>
+<span class="class"><span class="keyword">class</span> <span class="title">ABM</span>.<span class="title">Model</span>  </span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>Class variable for layers parameters. 
 Can be added to by programmer to modify/create layers, <strong>before</strong> starting your own model.
@@ -323,11 +352,11 @@ Example:</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Constructor: </p>
 <ul>
@@ -341,21 +370,22 @@ Example:</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  constructor: (
-    <span class="property">@div</span>, size, minX, maxX, minY, maxY,
-    isTorus=<span class="literal">true</span>, hasNeighbors=<span class="literal">true</span>
+    <span class="property">@div</span>, size=<span class="number">13</span>, minX=-<span class="number">16</span>, maxX=<span class="number">16</span>, minY=-<span class="number">16</span>, maxY=<span class="number">16</span>,
+    isTorus=<span class="literal">false</span>, hasNeighbors=<span class="literal">true</span>
   ) -&gt;
-    ABM.model = @ <span class="comment">#; numX = maxX-minX+1; numY = maxY-minY+1    </span>
+    ABM.model = @
     <span class="property">@setWorld</span> size, minX, maxX, minY, maxY, isTorus, hasNeighbors
-    <span class="property">@contexts</span> = ABM.contexts = {}</pre></div></div>
+    <span class="property">@contexts</span> = ABM.contexts = {}
+    document.getElementById(div).setAttribute <span class="string">'style'</span>, <span class="string">"position:relative"</span></pre></div></div>
             
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <ul>
 <li>Create 2D canvas contexts layered on top of each other.</li>
@@ -371,38 +401,10 @@ ctx.restore() # restore patch coord system</code></pre>
             
             <div class="content"><div class='highlight'><pre>    
     <span class="keyword">for</span> own k,v <span class="keyword">of</span> <span class="property">@contextsInit</span>
-      <span class="property">@contexts</span>[k] = ctx = u.createLayer div, <span class="property">@world</span>.width, <span class="property">@world</span>.height, v.z, v.ctx
-      <span class="property">@setCtxTransform</span>(ctx)</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p>One of the layers is used for drawing only, not an agentset:</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="property">@drawing</span> = ABM.drawing = <span class="property">@contexts</span>.drawing</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
-              </div>
-              <p>Setup spotlight layer, also not an agentset:</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="property">@contexts</span>.spotlight.globalCompositeOperation = <span class="string">"xor"</span></pre></div></div>
+      <span class="property">@contexts</span>[k] = ctx = u.createLayer div, <span class="property">@world</span>.pxWidth, <span class="property">@world</span>.pxHeight, v.z, v.ctx
+      <span class="property">@setCtxTransform</span> ctx
+      u.ctxTextParams ctx, <span class="string">"10px sans-serif"</span>, <span class="string">"center"</span>, <span class="string">"middle"</span>
+    u.fillCtx <span class="property">@contexts</span>.patches, [<span class="number">100</span>, <span class="number">100</span>, <span class="number">100</span>]</pre></div></div>
             
         </li>
         
@@ -413,11 +415,12 @@ ctx.restore() # restore patch coord system</code></pre>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Initialize animator to default: 30fps, not async</p>
+              <p>One of the layers is used for drawing only, not an agentset:</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="property">@anim</span> = <span class="keyword">new</span> ABM.Animator(@)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="property">@drawing</span> = ABM.drawing = <span class="property">@contexts</span>.drawing
+    <span class="property">@drawing</span>.<span class="function"><span class="title">clear</span></span> = =&gt; u.clearCtx <span class="property">@drawing</span></pre></div></div>
             
         </li>
         
@@ -427,6 +430,36 @@ ctx.restore() # restore patch coord system</code></pre>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Setup spotlight layer, also not an agentset:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="property">@contexts</span>.spotlight.globalCompositeOperation = <span class="string">"xor"</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Initialize animator to default: 30fps, not async</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="property">@anim</span> = <span class="keyword">new</span> ABM.Animator @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Set drawing controls.  Default to drawing each agentset.
 Optimization: If any of these is set to false, the associated
@@ -439,11 +472,11 @@ agentset is drawn only once, remaining static after that.</p>
         </li>
         
         
-        <li id="section-21">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Initialize agentsets.</p>
 
@@ -456,55 +489,21 @@ agentset is drawn only once, remaining static after that.</p>
         </li>
         
         
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
-              </div>
-              <p>Call the models setup function. Set the list of global variables to
-the new variables created by setup(). Do not include agentsets, they
-are available in the ABM global.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="property">@setup</span>()</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
-              </div>
-              <p>Stop and reset the model</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  reset: () -&gt; 
-    <span class="property">@anim</span>.reset() <span class="comment"># stop &amp; reset ticks/steps counters</span>
-    <span class="property">@patches</span> = ABM.patches = <span class="keyword">new</span> ABM.Patches ABM.Patch, <span class="string">"patches"</span>
-    <span class="property">@agents</span> = ABM.agents = <span class="keyword">new</span> ABM.Agents ABM.Agent, <span class="string">"agents"</span>
-    <span class="property">@links</span> = ABM.links = <span class="keyword">new</span> ABM.Links ABM.Link, <span class="string">"links"</span>
-    <span class="property">@setCtxTransform</span> v <span class="keyword">for</span> k,v <span class="keyword">of</span> <span class="property">@contexts</span> <span class="comment"># clear/resize all contexts</span>
-    u.s.spriteSheets.length = <span class="number">0</span> <span class="comment"># possibly null out entries?</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
-              <p>reset, then setup and start the model</p>
+              <p>Initialize model global resources</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  restart: -&gt; <span class="property">@reset</span>(); <span class="property">@setup</span>(); <span class="property">@start</span>()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>    <span class="property">@modelReady</span> = <span class="literal">false</span>;
+    <span class="property">@globalNames</span> = (u.ownKeys @).concat <span class="string">"globalNames"</span>
+    <span class="property">@globalNames</span>.set = <span class="literal">false</span>
+    <span class="property">@startup</span>()
+    u.waitOnFiles =&gt; <span class="property">@modelReady</span>=<span class="literal">true</span>; <span class="property">@setup</span>(); <span class="property">@globals</span>() <span class="keyword">unless</span> <span class="property">@globalNames</span>.set</pre></div></div>
             
         </li>
         
@@ -520,13 +519,19 @@ are available in the ABM global.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  setWorld: (size, minX, maxX, minY, maxY, isTorus=<span class="literal">true</span>, hasNeighbors=<span class="literal">true</span>) -&gt;
-    numX = maxX-minX+<span class="number">1</span>; numY = maxY-minY+<span class="number">1</span>; width = numX*size; height = numY*size
-    ABM.world = <span class="property">@world</span> = {size,minX,maxX,minY,maxY,numX,numY,width,height,isTorus,hasNeighbors}
+    numX = maxX-minX+<span class="number">1</span>; numY = maxY-minY+<span class="number">1</span>; pxWidth = numX*size; pxHeight = numY*size
+    minXcor=minX-<span class="number">.5</span>; maxXcor=maxX+<span class="number">.5</span>; minYcor=minY-<span class="number">.5</span>; maxYcor=maxY+<span class="number">.5</span>
+    ABM.world = <span class="property">@world</span> = {size,minX,maxX,minY,maxY,minXcor,maxXcor,minYcor,maxYcor,
+      numX,numY,pxWidth,pxHeight,isTorus,hasNeighbors}
   setCtxTransform: (ctx) -&gt;
-    ctx.canvas.width = <span class="property">@world</span>.width; ctx.canvas.height = <span class="property">@world</span>.height
+    ctx.canvas.width = <span class="property">@world</span>.pxWidth; ctx.canvas.height = <span class="property">@world</span>.pxHeight
     ctx.save()
     ctx.scale <span class="property">@world</span>.size, -<span class="property">@world</span>.size
-    ctx.translate -(<span class="property">@world</span>.minX-<span class="number">.5</span>), -(<span class="property">@world</span>.maxY+<span class="number">.5</span>)</pre></div></div>
+    ctx.translate -(<span class="property">@world</span>.minXcor), -(<span class="property">@world</span>.maxYcor)
+  globals: (globalNames) -&gt;
+    <span class="keyword">if</span> globalNames? 
+    <span class="keyword">then</span> <span class="property">@globalNames</span> = globalNames; <span class="property">@globalNames</span>.set = <span class="literal">true</span>
+    <span class="keyword">else</span> <span class="property">@globalNames</span> = u.removeItems u.ownKeys(@), <span class="property">@globalNames</span></pre></div></div>
             
         </li>
         
@@ -617,7 +622,9 @@ Optimizes patchRect, inRadius and inCone</p>
               <div class="pilwrap for-h3">
                 <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
-              <h3>Text Utilities:</h3>
+              <h3>User Model Creation</h3>
+<p>A user&#39;s model is made by subclassing Model and over-riding these
+two abstract methods. <code>super</code> need not be called.</p>
 
             </div>
             
@@ -630,14 +637,11 @@ Optimizes patchRect, inRadius and inCone</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
-              <p>Set the text parameters for an agentset&#39;s context.  See ABM.util.</p>
+              <p>Initialize model resources (images, files) here.  Can be async.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setTextParams: (agentset, domFont, align=<span class="string">"center"</span>, baseline=<span class="string">"middle"</span>) -&gt;
-    u.ctxTextParams <span class="property">@contexts</span>[agentset.name], domFont, align, baseline
-  setLabelParams: (agentset, color, xy) -&gt;
-    u.ctxLabelParams <span class="property">@contexts</span>[agentset.name], color, xy</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  startup: -&gt; <span class="comment"># called by constructor</span></pre></div></div>
             
         </li>
         
@@ -645,14 +649,14 @@ Optimizes patchRect, inRadius and inCone</p>
         <li id="section-33">
             <div class="annotation">
               
-              <div class="pilwrap for-h3">
+              <div class="pilwrap ">
                 <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
-              <h3>User Model Creation</h3>
-<p>A user&#39;s model is made by subclassing Model and over-riding these
-two abstract methods. <code>super</code> need not be called.</p>
+              <p>Initialize your model variables and defaults here. No async w/o good handlers.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  setup: -&gt;</pre></div></div>
             
         </li>
         
@@ -663,11 +667,11 @@ two abstract methods. <code>super</code> need not be called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
-              <p>Initialize your model here.</p>
+              <p>Update/step your model here</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setup: -&gt; <span class="comment"># called at the end of model creation</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  step: -&gt; <span class="comment"># called each step of the animation</span></pre></div></div>
             
         </li>
         
@@ -675,14 +679,19 @@ two abstract methods. <code>super</code> need not be called.</p>
         <li id="section-35">
             <div class="annotation">
               
-              <div class="pilwrap ">
+              <div class="pilwrap for-h3">
                 <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
-              <p>Update/step your model here</p>
+              <h3>Animation and Reset methods</h3>
+<p>Convenience access to animator:</p>
+<p>Start/stop the animation</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  step: -&gt; <span class="comment"># called each step of the animation</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  start: -&gt; u.waitOn (=&gt; <span class="property">@modelReady</span>), (=&gt; <span class="property">@anim</span>.start()); @
+  stop:  -&gt; <span class="property">@anim</span>.stop()
+  stopped: -&gt; <span class="property">@anim</span>.stopped
+  toggle: -&gt; <span class="keyword">if</span> <span class="property">@anim</span>.stopped <span class="keyword">then</span> <span class="property">@start</span>() <span class="keyword">else</span> <span class="property">@stop</span>()</pre></div></div>
             
         </li>
         
@@ -693,13 +702,11 @@ two abstract methods. <code>super</code> need not be called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
-              <p>Convenience access to animator:</p>
-<p>Start/stop the animation</p>
+              <p>Animate once by <code>step(); draw()</code>. For UI and debugging from console.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  start: -&gt; <span class="property">@anim</span>.start()
-  stop: -&gt; <span class="property">@anim</span>.stop()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  once: -&gt; <span class="property">@stop</span>() <span class="keyword">unless</span> <span class="property">@anim</span>.stopped; <span class="property">@anim</span>.once()</pre></div></div>
             
         </li>
         
@@ -710,11 +717,20 @@ two abstract methods. <code>super</code> need not be called.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
-              <p>Animate once by <code>step(); draw()</code>. For debugging from console.</p>
+              <p>Stop and reset the model, restarting if currently running</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  once: -&gt; <span class="property">@anim</span>.once()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  reset: () -&gt; 
+    running = <span class="keyword">not</span> <span class="property">@stopped</span>()
+    <span class="property">@anim</span>.reset() <span class="comment"># stop &amp; reset ticks/steps counters</span>
+    <span class="property">@patches</span> = ABM.patches = <span class="keyword">new</span> ABM.Patches ABM.Patch, <span class="string">"patches"</span>
+    <span class="property">@agents</span> = ABM.agents = <span class="keyword">new</span> ABM.Agents ABM.Agent, <span class="string">"agents"</span>
+    <span class="property">@links</span> = ABM.links = <span class="keyword">new</span> ABM.Links ABM.Link, <span class="string">"links"</span>
+    <span class="property">@setCtxTransform</span> v <span class="keyword">for</span> k,v <span class="keyword">of</span> <span class="property">@contexts</span> <span class="comment"># clear/resize all contexts</span>
+    u.s.spriteSheets.length = <span class="number">0</span> <span class="comment"># possibly null out entries?</span>
+    <span class="property">@setup</span>()
+    <span class="property">@start</span>() <span class="keyword">if</span> running</pre></div></div>
             
         </li>
         
@@ -744,10 +760,10 @@ to avoid redrawing the same static scene. Called by animator.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  draw: -&gt;
-    <span class="property">@patches</span>.draw <span class="property">@contexts</span>.patches  <span class="keyword">if</span> <span class="property">@refreshPatches</span> <span class="keyword">or</span> <span class="property">@anim</span>.draws <span class="keyword">is</span> <span class="number">1</span>
-    <span class="property">@links</span>.draw   <span class="property">@contexts</span>.links    <span class="keyword">if</span> <span class="property">@refreshLinks</span>   <span class="keyword">or</span> <span class="property">@anim</span>.draws <span class="keyword">is</span> <span class="number">1</span>
-    <span class="property">@agents</span>.draw  <span class="property">@contexts</span>.agents   <span class="keyword">if</span> <span class="property">@refreshAgents</span>  <span class="keyword">or</span> <span class="property">@anim</span>.draws <span class="keyword">is</span> <span class="number">1</span>
+            <div class="content"><div class='highlight'><pre>  draw: (force=<span class="property">@anim</span>.stopped) -&gt;
+    <span class="property">@patches</span>.draw <span class="property">@contexts</span>.patches  <span class="keyword">if</span> force <span class="keyword">or</span> <span class="property">@refreshPatches</span> <span class="keyword">or</span> <span class="property">@anim</span>.draws <span class="keyword">is</span> <span class="number">1</span>
+    <span class="property">@links</span>.draw   <span class="property">@contexts</span>.links    <span class="keyword">if</span> force <span class="keyword">or</span> <span class="property">@refreshLinks</span>   <span class="keyword">or</span> <span class="property">@anim</span>.draws <span class="keyword">is</span> <span class="number">1</span>
+    <span class="property">@agents</span>.draw  <span class="property">@contexts</span>.agents   <span class="keyword">if</span> force <span class="keyword">or</span> <span class="property">@refreshAgents</span>  <span class="keyword">or</span> <span class="property">@anim</span>.draws <span class="keyword">is</span> <span class="number">1</span>
     <span class="property">@drawSpotlight</span> <span class="property">@spotlightAgent</span>, <span class="property">@contexts</span>.spotlight  <span class="keyword">if</span> <span class="property">@spotlightAgent</span>?</pre></div></div>
             
         </li>
@@ -767,7 +783,7 @@ Use:</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>  setSpotlight: (<span class="property">@spotlightAgent</span>) -&gt;
-    u.clearCtx <span class="property">@contexts</span>.spotlight <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@spotlightAgent</span>?
+    u.clearCtx <span class="property">@contexts</span>.spotlight <span class="keyword">unless</span> <span class="property">@spotlightAgent</span>?
 
   drawSpotlight: (agent, ctx) -&gt;
     u.clearCtx ctx
@@ -809,8 +825,9 @@ Use:</p>
 <p>These agentset&#39;s <code>create</code> method create subclasses of Agent/Link.
 Use of <breed>.setDefault methods work as for agents/links, creating default
 values for the breed set:</p>
-<pre><code>@embers.setDefaultColor [255,0,0]</code></pre>
-<p>..will set the default color for just the embers.</p>
+<pre><code>@embers.setDefault &quot;color&quot;, [255,0,0]</code></pre>
+<p>..will set the default color for just the embers. Note: patch breeds are currently
+not usable due to the patches being prebuilt.  Stay tuned.</p>
 
             </div>
             
@@ -819,15 +836,15 @@ values for the breed set:</p>
     breeds = []; breeds.classes = {}; breeds.sets = {}
     <span class="keyword">for</span> b <span class="keyword">in</span> s.split(<span class="string">" "</span>)
       c = <span class="class"><span class="keyword">class</span> <span class="title">Breed</span> <span class="keyword">extends</span> <span class="title">agentClass</span></span>
-      @[b] = <span class="comment"># add @&lt;breed&gt; to local scope</span>
+      breed = @[b] = <span class="comment"># add @&lt;breed&gt; to local scope</span>
         <span class="keyword">new</span> breedSet c, b, agentClass::breed <span class="comment"># create subset agentSet</span>
-      breeds.push @[b]
-      breeds.sets[b] = @[b]
+      breeds.push breed
+      breeds.sets[b] = breed
       breeds.classes[<span class="string">"<span class="subst">#{b}</span>Class"</span>] = c
     breeds
-  patchBreeds: (s) -&gt; ABM.patchBreeds = <span class="property">@createBreeds</span> s, ABM.Patch, ABM.Patches
-  agentBreeds: (s) -&gt; ABM.agentBreeds = <span class="property">@createBreeds</span> s, ABM.Agent, ABM.Agents
-  linkBreeds:  (s) -&gt; ABM.linkBreeds  = <span class="property">@createBreeds</span> s, ABM.Link,  ABM.Links</pre></div></div>
+  patchBreeds: (s) -&gt; <span class="property">@patches</span>.breeds = <span class="property">@createBreeds</span> s, ABM.Patch, ABM.Patches
+  agentBreeds: (s) -&gt; <span class="property">@agents</span>.breeds  = <span class="property">@createBreeds</span> s, ABM.Agent, ABM.Agents
+  linkBreeds:  (s) -&gt; <span class="property">@links</span>.breeds   = <span class="property">@createBreeds</span> s, ABM.Link,  ABM.Links</pre></div></div>
             
         </li>
         
@@ -844,8 +861,7 @@ even.shuffle().getProp(&quot;id&quot;) # [6, 0, 4, 2, 8]</code></pre>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  asSet: (a) -&gt; <span class="comment"># turns an array into an agent set</span>
-    ABM.AgentSet.asSet(a)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  asSet: (a, setType = ABM.AgentSet) -&gt; ABM.AgentSet.asSet a, setType</pre></div></div>
             
         </li>
         
@@ -863,7 +879,8 @@ See <a href="http://goo.gl/1i7bd">CoffeeConsole</a> Chrome extension too.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setRootVars: -&gt;
+            <div class="content"><div class='highlight'><pre>  debug: (<span class="property">@debugging</span> = <span class="literal">true</span>)-&gt; <span class="property">@setRootVars</span>(); @
+  setRootVars: -&gt;
     root.ps  = <span class="property">@patches</span>
     root.p0  = <span class="property">@patches</span>[<span class="number">0</span>]
     root.as  = <span class="property">@agents</span>
@@ -872,16 +889,12 @@ See <a href="http://goo.gl/1i7bd">CoffeeConsole</a> Chrome extension too.</p>
     root.l0  = <span class="property">@links</span>[<span class="number">0</span>]
     root.dr  = <span class="property">@drawing</span>
     root.u   = ABM.util
-    root.sh  = ABM.shapes
-    root.app = @
     root.cx  = <span class="property">@contexts</span>
-    root.ab  = ABM.agentBreeds
-    root.lb  = ABM.linkBreeds
     root.an  = <span class="property">@anim</span>
     root.wd  = ABM.world
     root.gl  = <span class="property">@globals</span>
     root.root= root
-    <span class="literal">null</span></pre></div></div>
+    root.app = @</pre></div></div>
             
         </li>
         

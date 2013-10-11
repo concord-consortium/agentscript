@@ -77,7 +77,7 @@ Thus @ABM is placed in the global scope.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="property">@ABM</span>={}
+            <div class="content"><div class='highlight'><pre><span class="property">@ABM</span>={} 
 
 root = @ <span class="comment"># Keep a private copy of global object</span></pre></div></div>
             
@@ -165,12 +165,29 @@ Alias: u is an alias for ABM.util within the agentscript module (not outside)</p
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
+              <p>Two max/min int values. One for 2^53, largest int in float64, other for
+bitwise ops which are 32 bit. See <a href="http://goo.gl/WpAzT">discussion</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  MaxINT: Math.pow(<span class="number">2</span>,<span class="number">53</span>); MinINT: -Math.pow(<span class="number">2</span>,<span class="number">53</span>) <span class="comment"># -@MaxINT fails, @ not defined yet</span>
+  MaxINT32: <span class="number">0</span>|<span class="number">0x7fffffff</span>; MinINT32: <span class="number">0</span>|<span class="number">0x80000000</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
               <p>Good replacements for Javascript&#39;s badly broken<code>typeof</code> and <code>instanceof</code>
 See <a href="http://goo.gl/L0umK">underscore.coffee</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  isArray: Array.isArray <span class="keyword">or</span> <span class="comment"># works with agentSets too</span>
+            <div class="content"><div class='highlight'><pre>  isArray: Array.isArray <span class="keyword">or</span>
     (obj) -&gt; !!(obj <span class="keyword">and</span> obj.concat <span class="keyword">and</span> obj.unshift <span class="keyword">and</span> <span class="keyword">not</span> obj.callee)
   isFunction: (obj) -&gt; 
     !!(obj <span class="keyword">and</span> obj.constructor <span class="keyword">and</span> obj.call <span class="keyword">and</span> obj.apply)
@@ -180,11 +197,11 @@ See <a href="http://goo.gl/L0umK">underscore.coffee</a></p>
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-7">&#182;</a>
+                <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
               <h3>Numeric Operations</h3>
 <p>Return random int in [0,max) or [min,max)</p>
@@ -197,11 +214,11 @@ See <a href="http://goo.gl/L0umK">underscore.coffee</a></p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-8">&#182;</a>
+                <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>Return float Gaussian normal with given mean, std deviation.</p>
 
@@ -215,11 +232,11 @@ See <a href="http://goo.gl/L0umK">underscore.coffee</a></p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-9">&#182;</a>
+                <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
               <p>Return float in [0,max) or [min,max) or [-r/2,r/2)</p>
 
@@ -232,34 +249,19 @@ See <a href="http://goo.gl/L0umK">underscore.coffee</a></p>
         </li>
         
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p>Return log n where base is 10, base, e respectively</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  log10: (n) -&gt; Math.log(n)/Math.LN10
-  logN: (n, base) -&gt; Math.log(n)/Math.log(base)</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-11">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Note: ln: (n) -&gt; Math.log n
-Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not mod.</p>
+              <p>Return log n where base is 10, base, e respectively</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  mod: (v, n) -&gt; ((v % n) + n) % n</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  log10: (n) -&gt; Math.log(n)/Math.LN10
+  logN: (n, base) -&gt; Math.log(n)/Math.log(base)
+  ln: (n) -&gt; Math.log n</pre></div></div>
             
         </li>
         
@@ -270,11 +272,11 @@ Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not m
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Return v to be between min, max via mod fcn</p>
+              <p>Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not mod.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  wrap: (v, min, max) -&gt; min + <span class="property">@mod</span>(v-min, max-min)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  mod: (v, n) -&gt; ((v % n) + n) % n</pre></div></div>
             
         </li>
         
@@ -285,11 +287,11 @@ Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not m
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>Return v to be between min, max via clamping with min/max</p>
+              <p>Return v to be between min, max via mod fcn</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  clamp: (v, min, max) -&gt; Math.max(Math.min(v,max),min)</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  wrap: (v, min, max) -&gt; min + <span class="property">@mod</span>(v-min, max-min)</pre></div></div>
             
         </li>
         
@@ -300,11 +302,11 @@ Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not m
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Return sign of a number as +/- 1</p>
+              <p>Return v to be between min, max via clamping with min/max</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  sign: (v) -&gt; <span class="keyword">return</span> (<span class="keyword">if</span> v&lt;<span class="number">0</span> <span class="keyword">then</span> -<span class="number">1</span> <span class="keyword">else</span> <span class="number">1</span>) <span class="comment"># retrun exp: force ?: JS form</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  clamp: (v, min, max) -&gt; Math.max(Math.min(v,max),min)</pre></div></div>
             
         </li>
         
@@ -315,7 +317,39 @@ Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not m
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Return a float array with given precision; useful for printing</p>
+              <p>Return sign of a number as +/- 1</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  sign: (v) -&gt; <span class="keyword">if</span> v&lt;<span class="number">0</span> <span class="keyword">then</span> -<span class="number">1</span> <span class="keyword">else</span> <span class="number">1</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>Return n to given precision, default 2
+Considerably faster than equivalent: Number(n.toFixed(p))</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  fixed: (n,p=<span class="number">2</span>) -&gt; p = Math.pow(<span class="number">10</span>,p); Math.round(n*p)/p</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>Return an array of floating pt numbers as strings at given precision;
+useful for printing</p>
 
             </div>
             
@@ -324,11 +358,11 @@ Return true <a href="http://goo.gl/spr24">mod functin</a>, % is remainder, not m
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-18">&#182;</a>
               </div>
               <h3>Color and Angle Operations</h3>
 <p>Our colors are r,g,b,[a] arrays, with an optional color.str HTML
@@ -339,11 +373,11 @@ color string property. The str value is set on the first call to colorStr</p>
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
+                <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
               <p>Return a random RGB or gray color. Array passed to minimize garbage collection</p>
 
@@ -357,11 +391,11 @@ color string property. The str value is set on the first call to colorStr</p>
         </li>
         
         
-        <li id="section-18">
+        <li id="section-20">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
+                <a class="pilcrow" href="#section-20">&#182;</a>
               </div>
               <p>Note: if 2 args passed, assume they&#39;re min, max w/ default c</p>
 
@@ -377,46 +411,49 @@ color string property. The str value is set on the first call to colorStr</p>
         </li>
         
         
-        <li id="section-19">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
-              <p>Random color from a colormap set of r,g,b values, default is one of 125 (5^3) colors</p>
+              <p>Random color from a colormap set of r,g,b values.
+Default is one of 125 (5^3) colors</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  randomMapColor: (c = [], set = [<span class="number">0</span>,<span class="number">63</span>,<span class="number">127</span>,<span class="number">191</span>,<span class="number">255</span>]) -&gt; 
-    <span class="property">@setColor</span> c, u.oneOf(set), u.oneOf(set), u.oneOf(set)
+    <span class="property">@setColor</span> c, <span class="property">@oneOf</span>(set), <span class="property">@oneOf</span>(set), <span class="property">@oneOf</span>(set)
   randomBrightColor: (c=[]) -&gt; <span class="property">@randomMapColor</span> c, [<span class="number">0</span>,<span class="number">127</span>,<span class="number">255</span>]</pre></div></div>
             
         </li>
         
         
-        <li id="section-20">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
-              <p>Modify an existing color. Modifying an existing array minimizes GC overhead</p>
+              <p>Modify an existing rgb or gray color.  Alpha optional, not set if not provided.
+Modifying an existing array minimizes GC overhead</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>  setColor: (c, r, g, b, a) -&gt;
     c.str = <span class="literal">null</span> <span class="keyword">if</span> c.str?
     c[<span class="number">0</span>] = r; c[<span class="number">1</span>] = g; c[<span class="number">2</span>] = b; c[<span class="number">3</span>] = a <span class="keyword">if</span> a?
-    c</pre></div></div>
+    c
+  setGray: (c, g, a) -&gt; <span class="property">@setColor</span> c, g, g, g, a</pre></div></div>
             
         </li>
         
         
-        <li id="section-21">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>Return new color, c, by scaling each value of the rgb color max.</p>
 
@@ -430,11 +467,11 @@ color string property. The str value is set on the first call to colorStr</p>
         </li>
         
         
-        <li id="section-22">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Return HTML color as used by canvas element.  Can include Alpha</p>
 
@@ -447,11 +484,11 @@ color string property. The str value is set on the first call to colorStr</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Compare two colors.  Alas, there is no array.Equal operator.</p>
 
@@ -462,31 +499,110 @@ color string property. The str value is set on the first call to colorStr</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Convert r,g,b to a gray value (not color array). Round for 0-255 int.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  rgbToGray: (c) -&gt; <span class="number">0.2126</span>*c[<span class="number">0</span>] + <span class="number">0.7152</span>*c[<span class="number">1</span>] + <span class="number">0.0722</span>*c[<span class="number">2</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>RGB &lt;&gt; HSB (HSV) conversions.
+RGB in [0-255], HSB in [0-1]
+See <a href="http://en.wikipedia.org/wiki/HSV_color_space">Wikipedia</a>
+and <a href="http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c">Blog Post</a></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  rgbToHsb: (c) -&gt;
+    r=c[<span class="number">0</span>]<span class="regexp">/255; g=c[1]/255; b=c[2]/</span><span class="number">255</span>
+    max = Math.max(r,g,b); min = Math.min(r,g,b); v = max
+    h = <span class="number">0</span>; d = max-min; s = <span class="keyword">if</span> max <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">then</span> <span class="number">0</span> <span class="keyword">else</span> d/max
+    <span class="keyword">if</span> max <span class="keyword">isnt</span> min <span class="keyword">then</span> <span class="keyword">switch</span> max
+      <span class="keyword">when</span> r <span class="keyword">then</span> h = (g - b) / d + (<span class="keyword">if</span> g &lt; b <span class="keyword">then</span> <span class="number">6</span> <span class="keyword">else</span> <span class="number">0</span>)
+      <span class="keyword">when</span> g <span class="keyword">then</span> h = (b - r) / d + <span class="number">2</span>
+      <span class="keyword">when</span> b <span class="keyword">then</span> h = (r - g) / d + <span class="number">4</span>
+    [h/<span class="number">6</span>, s, v]
+  hsbToRgb: (c) -&gt;
+    h=c[<span class="number">0</span>]; s=c[<span class="number">1</span>]; v=c[<span class="number">2</span>]; i = Math.floor(h*<span class="number">6</span>)
+    f = h * <span class="number">6</span> - i;        p = v * (<span class="number">1</span> - s)
+    q = v * (<span class="number">1</span> - f * s);  t = v * (<span class="number">1</span> - (<span class="number">1</span> - f) * s)
+    <span class="keyword">switch</span>(i % <span class="number">6</span>)
+      <span class="keyword">when</span> <span class="number">0</span> <span class="keyword">then</span> r = v; g = t; b = p
+      <span class="keyword">when</span> <span class="number">1</span> <span class="keyword">then</span> r = q; g = v; b = p
+      <span class="keyword">when</span> <span class="number">2</span> <span class="keyword">then</span> r = p; g = v; b = t
+      <span class="keyword">when</span> <span class="number">3</span> <span class="keyword">then</span> r = p; g = q; b = v
+      <span class="keyword">when</span> <span class="number">4</span> <span class="keyword">then</span> r = t; g = p; b = v
+      <span class="keyword">when</span> <span class="number">5</span> <span class="keyword">then</span> r = v; g = p; b = q
+    [Math.round(r*<span class="number">255</span>), Math.round(g*<span class="number">255</span>), Math.round(b*<span class="number">255</span>)]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Return little/big endian-ness of hardware. 
 See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  isLittleEndian: -&gt;
-    d8 = <span class="keyword">new</span> Uint8ClampedArray <span class="number">4</span>
-    d32 = <span class="keyword">new</span> Uint32Array d8.buffer
-    d32[<span class="number">0</span>] = <span class="number">0x01020304</span>
-    d8[<span class="number">0</span>] <span class="keyword">is</span> <span class="number">4</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  isLittleEndian: -&gt;</pre></div></div>
             
         </li>
         
         
-        <li id="section-25">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>convert 1-int array to typed array</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    d32 = <span class="keyword">new</span> Uint32Array [<span class="number">0x01020304</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>return true if byte order reversed</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    (<span class="keyword">new</span> Uint8ClampedArray d32.buffer)[<span class="number">0</span>] <span class="keyword">is</span> <span class="number">4</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>Convert between degrees and radians.  We/Math package use radians.</p>
 
@@ -498,11 +614,11 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Return angle in (-pi,pi] that added to rad2 = rad1</p>
 
@@ -515,11 +631,11 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <h3>Object Operations</h3>
 
@@ -528,27 +644,28 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
-              <p>Return object&#39;s own variable names, less function in second version</p>
+              <p>Return object&#39;s own key or variable values</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  ownKeys: (obj) -&gt; key <span class="keyword">for</span> own key, value <span class="keyword">of</span> obj
-  ownVarKeys: (obj) -&gt; key <span class="keyword">for</span> own key, value <span class="keyword">of</span> obj <span class="keyword">when</span> <span class="keyword">not</span> <span class="property">@isFunction</span> value</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  ownKeys: (obj) -&gt; (key <span class="keyword">for</span> own key, value <span class="keyword">of</span> obj)
+  ownVarKeys: (obj) -&gt; (key <span class="keyword">for</span> own key, value <span class="keyword">of</span> obj <span class="keyword">when</span> <span class="keyword">not</span> <span class="property">@isFunction</span> value)
+  ownValues: (obj) -&gt; (value <span class="keyword">for</span> own key, value <span class="keyword">of</span> obj)</pre></div></div>
             
         </li>
         
         
-        <li id="section-29">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <h3>Array Operations</h3>
 
@@ -557,11 +674,11 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Does the array have any elements? Is the array empty?</p>
 
@@ -573,27 +690,29 @@ See Mozilla pixel <a href="http://goo.gl/Lxliq">manipulation article</a></p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Make a copy of the array. Needed when you don&#39;t want to modify the given
-array with mutator methods like sort, splice or your own functions.</p>
+array with mutator methods like sort, splice or your own functions.
+By giving begin/arguments, retrieve a subset of the array</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  clone: (array) -&gt; array.slice <span class="number">0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  clone: (array, begin, end) -&gt;
+    <span class="keyword">if</span> begin? <span class="keyword">then</span> array.slice begin, end <span class="keyword">else</span> array.slice <span class="number">0</span></pre></div></div>
             
         </li>
         
         
-        <li id="section-32">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Return last element of array.  Error if empty.</p>
 
@@ -606,11 +725,11 @@ array with mutator methods like sort, splice or your own functions.</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Return random element of array.  Error if empty.</p>
 
@@ -623,52 +742,101 @@ array with mutator methods like sort, splice or your own functions.</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-40">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-40">&#182;</a>
               </div>
-              <p>Return n random elements of array.  Error if n &gt; array size.</p>
+              <p>Return n random elements of array. Error if n &gt; length
+Note: array elements presumed unique, i.e. objects or distinct primitives</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  nOf: (array, n) -&gt; <span class="comment"># Note: clone, shuffle then first n may be better</span>
-    <span class="property">@error</span> <span class="string">"nOf: n &gt; length"</span> <span class="keyword">if</span> n &gt; array.length
+            <div class="content"><div class='highlight'><pre>  nOf: (array, n) -&gt; <span class="comment"># Note: clone, shuffle then first n: poor performance</span>
+    n = Math.min(array.length, Math.floor(n)) <span class="comment"># OK if n is float</span>
     r = []; <span class="keyword">while</span> r.length &lt; n
-      o = <span class="property">@oneOf</span>(array)
-      r.push o <span class="keyword">unless</span> o <span class="keyword">in</span> r
-    r
-  contains: (array, item) -&gt; -<span class="number">1</span> <span class="keyword">isnt</span> array.indexOf item</pre></div></div>
+      o = <span class="property">@oneOf</span>(array); r.push o <span class="keyword">unless</span> o <span class="keyword">in</span> r
+    r</pre></div></div>
             
         </li>
         
         
-        <li id="section-35">
+        <li id="section-41">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-41">&#182;</a>
               </div>
-              <p>Remove an item from an array. Error if item not in array.</p>
+              <p>True if item is in array. Binary search if f isnt null.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  removeItem: (array, item) -&gt;
-    array.splice i, <span class="number">1</span> <span class="keyword">if</span> (i = array.indexOf item) <span class="keyword">isnt</span> -<span class="number">1</span>
-    <span class="property">@error</span> <span class="string">"removeItem: item not found"</span> <span class="keyword">if</span> i &lt; <span class="number">0</span>
-    i</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  contains: (array, item, f) -&gt; <span class="property">@indexOf</span>(array, item, f) &gt;= <span class="number">0</span></pre></div></div>
             
         </li>
         
         
-        <li id="section-36">
+        <li id="section-42">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-42">&#182;</a>
               </div>
-              <p>Randomize the elements of array.  Clever! See <a href="http://goo.gl/TT2SY">cookbook</a></p>
+              <p>Remove an item from an array. Binary search if f isnt null.
+Error if item not in array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  removeItem: (array, item, f) -&gt;
+    <span class="keyword">unless</span> (i = <span class="property">@indexOf</span> array, item, f) &lt; <span class="number">0</span> <span class="keyword">then</span> array.splice i, <span class="number">1</span> 
+    <span class="keyword">else</span> <span class="property">@error</span> <span class="string">"removeItem: item not found"</span> <span class="comment">#; array</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>Remove elements in items from an array. Binary search if f isnt null.
+Error if an item not in array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  removeItems: (array, items, f) -&gt; <span class="property">@removeItem</span>(array,i,f) <span class="keyword">for</span> i <span class="keyword">in</span> items; array</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>Insert an item in a sorted array</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  insertItem: (array, item, f) -&gt;
+    i = <span class="property">@sortedIndex</span> array, item, f
+    error <span class="string">"insertItem: item already in array"</span> <span class="keyword">if</span> array[i] <span class="keyword">is</span> item
+    array.splice i, <span class="number">0</span>, item</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>Randomize the elements of this array.
+Clever! See <a href="http://goo.gl/TT2SY">cookbook</a></p>
 
             </div>
             
@@ -677,15 +845,16 @@ array with mutator methods like sort, splice or your own functions.</p>
         </li>
         
         
-        <li id="section-37">
+        <li id="section-46">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
+                <a class="pilcrow" href="#section-46">&#182;</a>
               </div>
               <p>Return o when f(o) min/max in array. Error if array empty.
 If f is a string, return element with max value of that property.
-If &quot;valueToo&quot; then return an array of the element and the value.</p>
+If &quot;valueToo&quot; then return an array of the element and the value;
+used for cases where f is costly function.</p>
 <pre><code>array = [{x:1,y:2}, {x:3,y:4}]
 # returns {x: 1, y: 2} 5
 [min, dist2] = minOneOf array, ((o)-&gt;o.x*o.x+o.y*o.y), true
@@ -696,13 +865,13 @@ max = maxOneOf array, &quot;x&quot;</code></pre>
             
             <div class="content"><div class='highlight'><pre>  minOneOf: (array, f, valueToo=<span class="literal">false</span>) -&gt;
     <span class="property">@error</span> <span class="string">"minOneOf: empty array"</span> <span class="keyword">if</span> <span class="property">@empty</span> array
-    r = Infinity; o = <span class="literal">null</span>; (s=f; <span class="function"><span class="title">f</span></span> = ((o)-&gt;o[s])) <span class="keyword">if</span> <span class="property">@isString</span> f
+    r = Infinity; o = <span class="literal">null</span>; f = <span class="property">@propFcn</span> f <span class="keyword">if</span> <span class="property">@isString</span> f
     <span class="keyword">for</span> a <span class="keyword">in</span> array
       (r = r1; o = a) <span class="keyword">if</span> (r1=f(a)) &lt; r
     <span class="keyword">if</span> valueToo <span class="keyword">then</span> [o, r] <span class="keyword">else</span> o
   maxOneOf: (array, f, valueToo=<span class="literal">false</span>) -&gt;
     <span class="property">@error</span> <span class="string">"maxOneOf: empty array"</span> <span class="keyword">if</span> <span class="property">@empty</span> array
-    r = -Infinity; o = <span class="literal">null</span>; (s=f; <span class="function"><span class="title">f</span></span> = ((o)-&gt;o[s])) <span class="keyword">if</span> <span class="property">@isString</span> f
+    r = -Infinity; o = <span class="literal">null</span>; f = <span class="property">@propFcn</span> f <span class="keyword">if</span> <span class="property">@isString</span> f
     <span class="keyword">for</span> a <span class="keyword">in</span> array
       (r = r1; o = a) <span class="keyword">if</span> (r1=f(a)) &gt; r
     <span class="keyword">if</span> valueToo <span class="keyword">then</span> [o, r] <span class="keyword">else</span> o</pre></div></div>
@@ -710,11 +879,11 @@ max = maxOneOf array, &quot;x&quot;</code></pre>
         </li>
         
         
-        <li id="section-38">
+        <li id="section-47">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
+                <a class="pilcrow" href="#section-47">&#182;</a>
               </div>
               <p>Return histogram of o when f(o) is a numeric value in array.
 Histogram interval is bin. Error if array empty.
@@ -729,8 +898,8 @@ h = histOf b, 2, &quot;id&quot;</code></pre>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  histOf: (array, bin, f) -&gt;
-    r = []; (s=f; <span class="function"><span class="title">f</span></span> = ((o)-&gt;o[s])) <span class="keyword">if</span> <span class="property">@isString</span> f
+            <div class="content"><div class='highlight'><pre>  histOf: (array, bin=<span class="number">1</span>, <span class="function"><span class="title">f</span></span>=(i)-&gt;i) -&gt;
+    r = []; f = <span class="property">@propFcn</span> f <span class="keyword">if</span> <span class="property">@isString</span> f
     <span class="keyword">for</span> a <span class="keyword">in</span> array
       i = Math.floor f(a)/bin
       r[i] = <span class="keyword">if</span> (ri=r[i])? <span class="keyword">then</span> ri+<span class="number">1</span> <span class="keyword">else</span> <span class="number">1</span>
@@ -740,11 +909,11 @@ h = histOf b, 2, &quot;id&quot;</code></pre>
         </li>
         
         
-        <li id="section-39">
+        <li id="section-48">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
+                <a class="pilcrow" href="#section-48">&#182;</a>
               </div>
               <p>Mutator. Sorts the array of objects in place by the property. Returns array.
 Clone first if you want to preserve the original array.</p>
@@ -759,11 +928,11 @@ sortBy array, &quot;i&quot;
         </li>
         
         
-        <li id="section-40">
+        <li id="section-49">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
+                <a class="pilcrow" href="#section-49">&#182;</a>
               </div>
               <p>Mutator. Removes adjacent dups, by reference, in place from sorted array.
 Note &quot;by reference&quot; means litteraly same object, not copy. Returns array.
@@ -786,11 +955,11 @@ uniq b
         </li>
         
         
-        <li id="section-41">
+        <li id="section-50">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
+                <a class="pilcrow" href="#section-50">&#182;</a>
               </div>
               <p>Return a new array composed of the rows of a matrix. I.e. convert</p>
 <pre><code>[[1,2,3],[4,5,6]] to [1,2,3,4,5,6]</code></pre>
@@ -802,11 +971,26 @@ uniq b
         </li>
         
         
-        <li id="section-42">
+        <li id="section-51">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-42">&#182;</a>
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <p>Return array of property values of given array of objects</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  aProp: (array, prop) -&gt; (a[prop] <span class="keyword">for</span> a <span class="keyword">in</span> array)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
               </div>
               <p>Return max/min/sum/avg of numeric array</p>
 
@@ -815,17 +999,18 @@ uniq b
             <div class="content"><div class='highlight'><pre>  aMax: (array) -&gt; array.reduce (a,b) -&gt; Math.max a,b
   aMin: (array) -&gt; array.reduce (a,b) -&gt; Math.min a,b
   aSum: (array) -&gt; array.reduce (a,b) -&gt; a+b
-  aMul: (array) -&gt; array.reduce (a,b) -&gt; a*b
-  aAvg: (array) -&gt; <span class="property">@aSum</span>(array)/array.length</pre></div></div>
+  aAvg: (array) -&gt; <span class="property">@aSum</span>(array)/array.length
+  
+  aNaNs: (array) -&gt; (i <span class="keyword">for</span> v,i <span class="keyword">in</span> array <span class="keyword">when</span> isNaN v)</pre></div></div>
             
         </li>
         
         
-        <li id="section-43">
+        <li id="section-53">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-43">&#182;</a>
+                <a class="pilcrow" href="#section-53">&#182;</a>
               </div>
               <p>Return array composed of f pairwise on both arrays</p>
 
@@ -839,11 +1024,11 @@ uniq b
         </li>
         
         
-        <li id="section-44">
+        <li id="section-54">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-44">&#182;</a>
+                <a class="pilcrow" href="#section-54">&#182;</a>
               </div>
               <p>Return a JS array given a TypedArray</p>
 
@@ -854,54 +1039,151 @@ uniq b
         </li>
         
         
-        <li id="section-45">
+        <li id="section-55">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-45">&#182;</a>
+                <a class="pilcrow" href="#section-55">&#182;</a>
               </div>
-              <p>Return an array with values in [0,norm], defaults to [0,1).
-Note: to have a half-open interval, [0,norm), use something like norm-.00009</p>
+              <p>Return a linear interpolation between lo and hi.
+Scale is in [0-1], and the result is in [lo,hi]
+<a href="http://goo.gl/QrzMc">Why the name <code>lerp</code>?</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  normalize: (array, norm=<span class="number">.999999999</span>) -&gt;
-    min = <span class="property">@aMin</span> array; scale = (norm)/(<span class="property">@aMax</span>(array) - min)
-    (num-min)*scale <span class="keyword">for</span> num <span class="keyword">in</span> array</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  lerp: (lo, hi, scale) -&gt; lo + (hi-lo)*scale <span class="comment"># @clamp(scale, 0, 1)</span></pre></div></div>
             
         </li>
         
         
-        <li id="section-46">
+        <li id="section-56">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-46">&#182;</a>
+                <a class="pilcrow" href="#section-56">&#182;</a>
               </div>
-              <p>Binary search of a sorted array, adapted from <a href="http://goo.gl/ozAZH">jaskenas</a>.
-Search for index of value with items array, using fcn for item value.
-Return -1 if not found.</p>
+              <p>Return point interpolated between two points.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  binarySearch: (items, value, <span class="function"><span class="title">fcn</span></span> = (ex) -&gt; ex) -&gt;
-    start = <span class="number">0</span>
-    stop  = items.length - <span class="number">1</span>
-    pivot = Math.floor (start + stop) / <span class="number">2</span>
-    <span class="keyword">while</span> (pivotVal = fcn(items[pivot])) <span class="keyword">isnt</span> value <span class="keyword">and</span> start &lt; stop
-      stop  = pivot - <span class="number">1</span> <span class="keyword">if</span> value &lt; pivotVal  <span class="comment"># Adjust the search area.</span>
-      start = pivot + <span class="number">1</span> <span class="keyword">if</span> value &gt; pivotVal
-      pivot = Math.floor (stop + start) / <span class="number">2</span>  <span class="comment"># Recalculate the pivot.</span>
-    <span class="keyword">if</span> fcn(items[pivot]) <span class="keyword">is</span> value <span class="keyword">then</span> pivot <span class="keyword">else</span> -<span class="number">1</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  lerp2: (x0, y0, x1, y1, scale) -&gt; [<span class="property">@lerp</span>(x0,x1,scale), <span class="property">@lerp</span>(y0,y1,scale)]</pre></div></div>
             
         </li>
         
         
-        <li id="section-47">
+        <li id="section-57">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-57">&#182;</a>
+              </div>
+              <p>Return an array with values in [lo,hi], defaults to [0,1].
+Note: to have a half-open interval, [lo,hi), try hi=hi-.00009</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  normalize: (array, lo = <span class="number">0</span>, hi = <span class="number">1</span>) -&gt;
+    min = <span class="property">@aMin</span> array; max = <span class="property">@aMax</span> array; scale = <span class="number">1</span>/(max-min)
+    (<span class="property">@lerp</span>(lo, hi, scale*(num-min)) <span class="keyword">for</span> num <span class="keyword">in</span> array)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-58">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-58">&#182;</a>
+              </div>
+              <p>Return array index of item, or index for item if array to remain sorted.
+f is used to return an integer for sorting, primarily for object properties.
+If f is a string, it is the object property to sort by.
+Adapted from underscore&#39;s _.sortedIndex.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  sortedIndex: (array, item, <span class="function"><span class="title">f</span></span>=(o)-&gt;o) -&gt; <span class="comment"># update to _.sortedIndex someday</span>
+    f = <span class="property">@propFcn</span> f <span class="keyword">if</span> <span class="property">@isString</span> f <span class="comment"># use item[f] if f is string</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-59">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-59">&#182;</a>
+              </div>
+              <p>Why not array.length - 1? Because we can insert 1 after end of array.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    value = f(item); low = <span class="number">0</span>; high = array.length
+    <span class="keyword">while</span> low &lt; high
+      mid = (low + high) &gt;&gt;&gt; <span class="number">1</span> <span class="comment"># floor (low+high)/2</span>
+      <span class="keyword">if</span> f(array[mid]) &lt; value <span class="keyword">then</span> low = mid + <span class="number">1</span> <span class="keyword">else</span> high = mid
+    low</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-60">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-60">&#182;</a>
+              </div>
+              <p>Return argument unchanged; for primitive arrays or objs sorted by reference</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  identity: (o) -&gt; o</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-61">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-61">&#182;</a>
+              </div>
+              <p>Return a function that returns an object&#39;s property.  Property in fcn closure.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  propFcn: (prop) -&gt; (o)-&gt;o[prop]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-62">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-62">&#182;</a>
+              </div>
+              <p>Return index of value in array or -1 if not found.
+If no property given, use Array.indexOf.
+If property given, use binary search.
+Property can be string or function. If property is &quot;&quot;, use identity default.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  indexOf: (array, item, property)-&gt;
+    <span class="keyword">if</span> property?
+      i = <span class="property">@sortedIndex</span> array, item, <span class="keyword">if</span> property <span class="keyword">is</span> <span class="string">""</span> <span class="keyword">then</span> <span class="literal">null</span> <span class="keyword">else</span> property
+      <span class="keyword">if</span> array[i] <span class="keyword">is</span> item <span class="keyword">then</span> i <span class="keyword">else</span> -<span class="number">1</span>
+    <span class="keyword">else</span> array.indexOf item</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-63">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-47">&#182;</a>
+                <a class="pilcrow" href="#section-63">&#182;</a>
               </div>
               <h3>Topology Operations</h3>
 
@@ -910,33 +1192,31 @@ Return -1 if not found.</p>
         </li>
         
         
-        <li id="section-48">
+        <li id="section-64">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-48">&#182;</a>
+                <a class="pilcrow" href="#section-64">&#182;</a>
               </div>
-              <p>Return angle in (-pi,pi] radians from x1,y1 to x2,y2.</p>
+              <p>Return angle in [-pi,pi] radians from x1,y1 to x2,y2
+<a href="http://goo.gl/JS8DF">See: Math.atan2</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  radsToward: (x1, y1, x2, y2) -&gt; 
-    PI = Math.PI; dx = x2-x1; dy = y2-y1
-    <span class="keyword">if</span> dx <span class="keyword">is</span> <span class="number">0</span> <span class="keyword">then</span> <span class="keyword">return</span> <span class="number">3</span>*PI<span class="regexp">/2 if dy &lt; 0; return PI/</span><span class="number">2</span> <span class="keyword">if</span> dy &gt; <span class="number">0</span>; <span class="keyword">return</span> <span class="number">0</span>
-    <span class="keyword">else</span> <span class="keyword">return</span> Math.atan(dy/dx) + <span class="keyword">if</span> dx &lt; <span class="number">0</span> <span class="keyword">then</span> PI <span class="keyword">else</span> <span class="number">0</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>  radsToward: (x1, y1, x2, y2) -&gt; Math.atan2 y2-y1, x2-x1</pre></div></div>
             
         </li>
         
         
-        <li id="section-49">
+        <li id="section-65">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-49">&#182;</a>
+                <a class="pilcrow" href="#section-65">&#182;</a>
               </div>
               <p>Return true if x2,y2 is in cone radians around heading radians from x1,x2
 and within distance radius from x1,x2.
-I.e. is p2 in cone/heading/radius from p1</p>
+I.e. is p2 in cone/heading/radius from p1?</p>
 
             </div>
             
@@ -948,11 +1228,11 @@ I.e. is p2 in cone/heading/radius from p1</p>
         </li>
         
         
-        <li id="section-50">
+        <li id="section-66">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-50">&#182;</a>
+                <a class="pilcrow" href="#section-66">&#182;</a>
               </div>
               <p>Return the Euclidean distance and distance squared between x1,y1, x2,y2.
 The squared distance is used for comparisons to avoid the Math.sqrt fcn.</p>
@@ -965,11 +1245,11 @@ The squared distance is used for comparisons to avoid the Math.sqrt fcn.</p>
         </li>
         
         
-        <li id="section-51">
+        <li id="section-67">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-51">&#182;</a>
+                <a class="pilcrow" href="#section-67">&#182;</a>
               </div>
               <p>Return the <a href="http://goo.gl/PgJ5N">torus distance</a> and distance squared
 between two points A(x1,y1) and B(x2,y2):</p>
@@ -1004,11 +1284,11 @@ A and B must also include the towards-reflections around A, thus 4 points.</p>
         </li>
         
         
-        <li id="section-52">
+        <li id="section-68">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-52">&#182;</a>
+                <a class="pilcrow" href="#section-68">&#182;</a>
               </div>
               <p>Return true if closest path between x1,y1 &amp; x2,y2 wraps around the torus.</p>
 
@@ -1021,11 +1301,11 @@ A and B must also include the towards-reflections around A, thus 4 points.</p>
         </li>
         
         
-        <li id="section-53">
+        <li id="section-69">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-53">&#182;</a>
+                <a class="pilcrow" href="#section-69">&#182;</a>
               </div>
               <p>Return 4 torus point reflections of x2,y2 around x1,y1</p>
 
@@ -1039,11 +1319,11 @@ A and B must also include the towards-reflections around A, thus 4 points.</p>
         </li>
         
         
-        <li id="section-54">
+        <li id="section-70">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-54">&#182;</a>
+                <a class="pilcrow" href="#section-70">&#182;</a>
               </div>
               <p>Return closest of 4 torus pts from A to B</p>
 
@@ -1059,11 +1339,11 @@ A and B must also include the towards-reflections around A, thus 4 points.</p>
         </li>
         
         
-        <li id="section-55">
+        <li id="section-71">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-55">&#182;</a>
+                <a class="pilcrow" href="#section-71">&#182;</a>
               </div>
               <p>Return the angle from x1,y1 to x2.y2 on torus using shortest reflection.</p>
 
@@ -1076,11 +1356,11 @@ A and B must also include the towards-reflections around A, thus 4 points.</p>
         </li>
         
         
-        <li id="section-56">
+        <li id="section-72">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-56">&#182;</a>
+                <a class="pilcrow" href="#section-72">&#182;</a>
               </div>
               <p>Return true if x2,y2 is in cone radians around heading radians from x1,x2
 and within distance radius from x1,x2 considering all torus reflections.</p>
@@ -1095,11 +1375,11 @@ and within distance radius from x1,x2 considering all torus reflections.</p>
         </li>
         
         
-        <li id="section-57">
+        <li id="section-73">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-57">&#182;</a>
+                <a class="pilcrow" href="#section-73">&#182;</a>
               </div>
               <h3>File I/O</h3>
 <p>Cache of file names used by file imports below</p>
@@ -1111,75 +1391,111 @@ and within distance radius from x1,x2 considering all torus reflections.</p>
         </li>
         
         
-        <li id="section-58">
+        <li id="section-74">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-58">&#182;</a>
+                <a class="pilcrow" href="#section-74">&#182;</a>
               </div>
               <p>Import an image, executing (async) optional function f(img) on completion</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  importImage: (name, f) -&gt;
-    <span class="keyword">if</span> (img=<span class="property">@fileIndex</span>[name])? <span class="keyword">or</span> ((img=name).width <span class="keyword">and</span> img.height)
-      f(img) <span class="keyword">if</span> f?
+            <div class="content"><div class='highlight'><pre>  importImage: (name, <span class="function"><span class="title">f</span></span> = -&gt;) -&gt;
+    <span class="keyword">if</span> (img=<span class="property">@fileIndex</span>[name])? <span class="comment"># wtf? or ((img=name).width and img.height)</span>
+      f(img) <span class="comment">#if img.isDone</span>
     <span class="keyword">else</span>
-      img = <span class="keyword">new</span> Image()
-      (img.<span class="function"><span class="title">onload</span></span> = -&gt; f(img)) <span class="keyword">if</span> f?
+      <span class="property">@fileIndex</span>[name] = img = <span class="keyword">new</span> Image()
+      img.isDone = <span class="literal">false</span>
+      img.<span class="function"><span class="title">onload</span></span> = -&gt; f(img); img.isDone = <span class="literal">true</span>
       img.src = name
-      <span class="property">@fileIndex</span>[name] = img
     img</pre></div></div>
             
         </li>
         
         
-        <li id="section-59">
+        <li id="section-75">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-59">&#182;</a>
+                <a class="pilcrow" href="#section-75">&#182;</a>
               </div>
-              <p>Use XMLHttpRequest to fetch data of several types.
-Data Types: text, arraybuffer, blob, json, document, <a href="http://goo.gl/y3r3h">Specification:</a></p>
+              <p>Use XMLHttpRequest to fetch data of several types. Data Types: text,
+arraybuffer, blob, json, document, <a href="http://goo.gl/y3r3h">See specification</a></p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  xhrLoadFile: (name, type=<span class="string">"text"</span>, f) -&gt; <span class="comment"># AJAX request, sync if f is null</span>
+            <div class="content"><div class='highlight'><pre>  xhrLoadFile: (name, type=<span class="string">"text"</span>, <span class="function"><span class="title">f</span></span> = -&gt;) -&gt; <span class="comment"># AJAX async request</span>
     <span class="keyword">if</span> (xhr=<span class="property">@fileIndex</span>[name])?
-      f(xhr.response) <span class="keyword">if</span> f?
+      f(xhr.response)
     <span class="keyword">else</span>
-      xhr = <span class="keyword">new</span> XMLHttpRequest()
-      xhr.open <span class="string">"GET"</span>, name, f?
+      <span class="property">@fileIndex</span>[name] = xhr = <span class="keyword">new</span> XMLHttpRequest()
+      xhr.isDone = <span class="literal">false</span>
+      xhr.open <span class="string">"POST"</span>, name <span class="comment"># POST vs GET best for big files?</span>
       xhr.responseType = type
-      (xhr.<span class="function"><span class="title">onload</span></span> = -&gt; f(xhr.response)) <span class="keyword">if</span> f?
+      xhr.<span class="function"><span class="title">onload</span></span> = -&gt; f(xhr.response); xhr.isDone = <span class="literal">true</span>
       xhr.send()
-      <span class="property">@fileIndex</span>[name] = xhr
     xhr</pre></div></div>
             
         </li>
         
         
-        <li id="section-60">
+        <li id="section-76">
             <div class="annotation">
               
-              <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-60">&#182;</a>
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-76">&#182;</a>
               </div>
-              <h3>Canvas/Context Operations</h3>
+              <p>Return true if all files are loaded.</p>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>  filesLoaded: (files = <span class="property">@fileIndex</span>) -&gt;
+    array = (v.isDone <span class="keyword">for</span> v <span class="keyword">in</span> (<span class="property">@ownValues</span> files))
+    array.reduce ((a,b)-&gt;a <span class="keyword">and</span> b), <span class="literal">true</span></pre></div></div>
             
         </li>
         
         
-        <li id="section-61">
+        <li id="section-77">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-61">&#182;</a>
+                <a class="pilcrow" href="#section-77">&#182;</a>
               </div>
-              <p>Create a new canvas of given width/height</p>
+              <p>Wait for files to be loaded before executing callback f</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  waitOnFiles: (f, files = <span class="property">@fileIndex</span>) -&gt; <span class="property">@waitOn</span> (=&gt; <span class="property">@filesLoaded</span> files), f</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-78">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-78">&#182;</a>
+              </div>
+              <p>Wait for function done() to return true before calling callback f</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  waitOn: (done, f) -&gt;
+    <span class="keyword">if</span> done() <span class="keyword">then</span> f() <span class="keyword">else</span> setTimeout (=&gt; <span class="property">@waitOn</span>(done, f)), <span class="number">1000</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-79">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-79">&#182;</a>
+              </div>
+              <h3>Canvas/Context Operations</h3>
+<p>Create a new canvas of given width/height</p>
 
             </div>
             
@@ -1191,11 +1507,11 @@ Data Types: text, arraybuffer, blob, json, document, <a href="http://goo.gl/y3r3
         </li>
         
         
-        <li id="section-62">
+        <li id="section-80">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-62">&#182;</a>
+                <a class="pilcrow" href="#section-80">&#182;</a>
               </div>
               <p>As above, but returing the context object.
 Note ctx.canvas is the canvas for the ctx, and can be use as an image.</p>
@@ -1204,18 +1520,18 @@ Note ctx.canvas is the canvas for the ctx, and can be use as an image.</p>
             
             <div class="content"><div class='highlight'><pre>  createCtx: (width, height, ctxType=<span class="string">"2d"</span>) -&gt;
     can = <span class="property">@createCanvas</span> width, height
-    <span class="keyword">if</span> ctxType <span class="keyword">is</span> <span class="string">"2d"</span> 
+    can.ctx = <span class="keyword">if</span> ctxType <span class="keyword">is</span> <span class="string">"2d"</span> 
     <span class="keyword">then</span> can.getContext <span class="string">"2d"</span> 
     <span class="keyword">else</span> can.getContext(<span class="string">"webgl"</span>) ? can.getContext(<span class="string">"experimental-webgl"</span>)</pre></div></div>
             
         </li>
         
         
-        <li id="section-63">
+        <li id="section-81">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-63">&#182;</a>
+                <a class="pilcrow" href="#section-81">&#182;</a>
               </div>
               <p>Return a &quot;layer&quot; 2D/3D rendering context within the specified HTML <code>&lt;div&gt;</code>,
 with the given width/height positioned absolutely at top/left within the div,
@@ -1233,11 +1549,11 @@ and with the z-index of z.</p>
         </li>
         
         
-        <li id="section-64">
+        <li id="section-82">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-64">&#182;</a>
+                <a class="pilcrow" href="#section-82">&#182;</a>
               </div>
               <p>Install identity transform.  Call ctx.restore() to revert to previous transform</p>
 
@@ -1250,11 +1566,11 @@ and with the z-index of z.</p>
         </li>
         
         
-        <li id="section-65">
+        <li id="section-83">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-65">&#182;</a>
+                <a class="pilcrow" href="#section-83">&#182;</a>
               </div>
               <p>Clear the 2D/3D layer to be transparent. Note this <a href="http://goo.gl/qekXS">discussion</a>.</p>
 
@@ -1272,11 +1588,11 @@ and with the z-index of z.</p>
         </li>
         
         
-        <li id="section-66">
+        <li id="section-84">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-66">&#182;</a>
+                <a class="pilcrow" href="#section-84">&#182;</a>
               </div>
               <p>Fill the 2D/3D layer with the given color</p>
 
@@ -1295,29 +1611,30 @@ and with the z-index of z.</p>
         </li>
         
         
-        <li id="section-67">
+        <li id="section-85">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-67">&#182;</a>
+                <a class="pilcrow" href="#section-85">&#182;</a>
               </div>
-              <p>Draw string of the given color at the xy location.
-Note that this will follow the existing transform.</p>
+              <p>Draw string of the given color at the xy location, in ctx pixel coords.
+Use setIdentity .. reset if a transform is being used by caller.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  ctxDrawText: (ctx, string, xy, color = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>]) -&gt; 
-    ctx.fillStyle = <span class="property">@colorStr</span> color
-    ctx.fillText(string, xy[<span class="number">0</span>], xy[<span class="number">1</span>])</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  ctxDrawText: (ctx, string, x, y, color = [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>], setIdentity = <span class="literal">true</span>) -&gt;
+    <span class="property">@setIdentity</span>(ctx) <span class="keyword">if</span> setIdentity
+    ctx.fillStyle = <span class="property">@colorStr</span> color;  ctx.fillText(string, x, y)
+    ctx.restore() <span class="keyword">if</span> setIdentity</pre></div></div>
             
         </li>
         
         
-        <li id="section-68">
+        <li id="section-86">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-68">&#182;</a>
+                <a class="pilcrow" href="#section-86">&#182;</a>
               </div>
               <p>Set the canvas text align and baseline drawing parameters</p>
 <ul>
@@ -1335,28 +1652,11 @@ Note that this will follow the existing transform.</p>
         </li>
         
         
-        <li id="section-69">
+        <li id="section-87">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-69">&#182;</a>
-              </div>
-              <p>2D: Store the default color and xy offset for text labels for agentsets.
-This is simply using the ctx object for convenient storage.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  ctxLabelParams: (ctx, color, xy) -&gt; <span class="comment"># patches/agents defaults</span>
-    ctx.labelColor = color; ctx.labelXY = xy</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-70">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-70">&#182;</a>
+                <a class="pilcrow" href="#section-87">&#182;</a>
               </div>
               <p>Convert an image to a context. ctx.canvas gives the created canvas.</p>
 
@@ -1370,11 +1670,11 @@ This is simply using the ctx object for convenient storage.</p>
         </li>
         
         
-        <li id="section-71">
+        <li id="section-88">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-71">&#182;</a>
+                <a class="pilcrow" href="#section-88">&#182;</a>
               </div>
               <p>Convert a context to an image, executing function f on completion.
 Generally can skip callback but see <a href="http://goo.gl/kIk2U">stackoverflow</a>
@@ -1391,11 +1691,11 @@ Fix: use ctx.canvas for programatic imaging.</p>
         </li>
         
         
-        <li id="section-72">
+        <li id="section-89">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-72">&#182;</a>
+                <a class="pilcrow" href="#section-89">&#182;</a>
               </div>
               <p>Convert a ctx to an imageData object</p>
 
@@ -1406,11 +1706,11 @@ Fix: use ctx.canvas for programatic imaging.</p>
         </li>
         
         
-        <li id="section-73">
+        <li id="section-90">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-73">&#182;</a>
+                <a class="pilcrow" href="#section-90">&#182;</a>
               </div>
               <p>Canvas versions of above</p>
 
@@ -1423,11 +1723,11 @@ Fix: use ctx.canvas for programatic imaging.</p>
         </li>
         
         
-        <li id="section-74">
+        <li id="section-91">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-74">&#182;</a>
+                <a class="pilcrow" href="#section-91">&#182;</a>
               </div>
               <p>Draw an image centered at x, y w/ image size dx, dy.
 See <a href="http://goo.gl/VUlhY">this tutorial</a>.</p>
@@ -1442,11 +1742,11 @@ See <a href="http://goo.gl/VUlhY">this tutorial</a>.</p>
         </li>
         
         
-        <li id="section-75">
+        <li id="section-92">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-75">&#182;</a>
+                <a class="pilcrow" href="#section-92">&#182;</a>
               </div>
               <p>Duplicate a ctx&#39;s image.  Returns the new ctx, use ctx.canvas for canvas.</p>
 
@@ -1460,11 +1760,11 @@ See <a href="http://goo.gl/VUlhY">this tutorial</a>.</p>
         </li>
         
         
-        <li id="section-76">
+        <li id="section-93">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-76">&#182;</a>
+                <a class="pilcrow" href="#section-93">&#182;</a>
               </div>
               <p>Resize a ctx/canvas and preserve data.</p>
 

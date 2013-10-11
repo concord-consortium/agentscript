@@ -1,24 +1,27 @@
 <html>
   <head>
     <title>AgentScript Model</title>
-    <script src="../agentscript.js"></script>
-    <script src="../coffee-script.js"></script>
+    <script src="../lib/agentscript.js"></script>
+    <script src="../tools/coffee-script.js"></script>
     <script type="text/coffeescript">
 
     u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      setup: -> # called by Model ctor
+      setup: ->
         @refreshAgents = false # for static agents
         
         # globals
         @prob = 1
         
         # defaults
-        @agents.setDefaultShape("circle")
-        @agents.setDefaultColor([210,0,0])
-        @agents.setDefaultSize(.4)
-        @agents.setDefaultPen(2.5)
-        @agents.setDefaultHeading(0) # override promotion to random angle
+        @patches.setDefault "labelOffset", [12,14]
+        @patches.setDefault "labelColor", [255,255,255]
+        u.ctxTextParams ABM.contexts.patches, "9px sans-serif", "right", "bottom"
+        @agents.setDefault "shape", "circle"
+        @agents.setDefault "color", ([210,0,0])
+        @agents.setDefault "size", .4
+        @agents.setDefault "hidden", 2.5
+        @agents.setDefault "heading",  0 # override promotion to random angle
 
         @anim.setRate 10
 
@@ -38,8 +41,8 @@
         @walker.p.occupied = true
         # @walker.penDown = true
         # @walker.penSize *= 2.5
-        @setTextParams @patches, "9px sans-serif", "right", "bottom"
-        @setLabelParams @patches, [255,255,255], [12,12]
+        # @setTextParams @patches, "9px sans-serif", "right", "bottom"
+        # @setLabelParams @patches, [255,255,255], [12,12]
       step: ->
         @floodFill()
         p = @asSet (n for n in @walker.p.n4 when n.ok)
@@ -49,6 +52,7 @@
         @walker.p.occupied = true
         (@stop(); console.log "prob: #{@prob}") if @done()
       
+      # drawNum: (n) -> @walker.label = ""+n; @prob /= n
       drawNum: (n) -> @walker.p.label = ""+n; @prob /= n
       done: -> @patches.last().occupied
       
@@ -74,15 +78,18 @@
           pset = (n for n in pnext when not n.ok and not n.occupied)
         null
 
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
-    #   NL Defaults: 13, -16, 16, -16, 16
-    APP=new MyModel "layers", 30, 0,10, 0,10, false
-    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
+    # div, patchSize, minX, maxX, minY, maxY, isTorus, hasNeighbors
+    #   Defaults: 13, -16, 16, -16, 16, false, true
+    # model = new MyModel "layers", 30, 0,10, 0,10
+    # model.setRootVars() # Debug: Put Model vars in global name space
+    # model.start() # Run model immediately after startup initialization
+    new MyModel("layers", 30, 0,10, 0,10)
+      .start()
+      .debug()
 
     </script>
   </head>
-  <body onload="ABM.model.start()">
-    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
-    <div id="layers" style="position:relative;padding:20;"></div>
+  <body>
+    <div id="layers" style="padding:20"></div>
   </body>
 </html>

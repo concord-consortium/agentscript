@@ -143,7 +143,6 @@ with three fields: id, x, y.</p>
 <pre><code>AS = for i in [1..5] # long form comprehension
   {id:i, x:u.randomInt(10), y:u.randomInt(10)}
 ABM.AgentSet.asSet AS # Convert AS to AgentSet in place
-# .. produced
    [{id:1,x:0,y:1}, {id:2,x:8,y:0}, {id:3,x:6,y:4},
     {id:4,x:1,y:3}, {id:5,x:1,y:1}]</code></pre>
 <h3>Constructor and add/remove agents.</h3>
@@ -166,10 +165,11 @@ This sub-array feature is how breeds are managed, see class <code>Model</code></
             </div>
             
             <div class="content"><div class='highlight'><pre>  constructor: (<span class="property">@agentClass</span>, <span class="property">@name</span>, <span class="property">@mainSet</span>) -&gt;
-    <span class="keyword">super</span>()
+    <span class="keyword">super</span>(<span class="number">0</span>) <span class="comment"># doesn't yield empty array if already instances in the mainSet</span>
+    <span class="property">@breeds</span> = [] <span class="keyword">unless</span> <span class="property">@mainSet</span>?
     <span class="property">@agentClass</span>::breed = @ <span class="comment"># let the breed know I'm it's agentSet</span>
-    <span class="property">@ownVariables</span> = []
-    <span class="property">@ID</span> = <span class="number">0</span> <span class="keyword">if</span> <span class="keyword">not</span> <span class="property">@mainSet</span>? <span class="comment"># Do not set ID if I'm a subset</span></pre></div></div>
+    <span class="property">@ownVariables</span> = [] <span class="comment"># keep list of user variables</span>
+    <span class="property">@ID</span> = <span class="number">0</span> <span class="keyword">unless</span> <span class="property">@mainSet</span>? <span class="comment"># Do not set ID if I'm a subset</span></pre></div></div>
             
         </li>
         
@@ -198,7 +198,7 @@ This sub-array feature is how breeds are managed, see class <code>Model</code></
               <p>Add an agent to the list.  Only used by agentset factory methods. Adds
 the <code>id</code> property to all agents. Increment <code>ID</code>.
 Returns the object for chaining. The set will be sorted by <code>id</code>.</p>
-<p>By &quot;agent&quot; we mean an instance of <code>Patch</code>, <code>Agent</code> and <code>Link</code>.</p>
+<p>By &quot;agent&quot; we mean an instance of <code>Patch</code>, <code>Agent</code> and <code>Link</code> and their breeds</p>
 
             </div>
             
@@ -226,24 +226,9 @@ array is unsorted, simply call <code>sortById</code> first, see <code>sortById</
             </div>
             
             <div class="content"><div class='highlight'><pre>  remove: (o) -&gt;
-    <span class="property">@mainSet</span>.remove o <span class="keyword">if</span> <span class="property">@mainSet</span>?
-    u.error <span class="string">"remove: empty arraySet"</span> <span class="keyword">if</span> <span class="property">@length</span> <span class="keyword">is</span> <span class="number">0</span>
-    <span class="keyword">if</span> o <span class="keyword">is</span> <span class="property">@last</span>()
-      @[--<span class="property">@length</span>] = <span class="literal">null</span> <span class="comment"># set last to null and decrease length (null: GC subtlety)</span>
-    <span class="keyword">else</span>
-      <span class="property">@splice</span> i, <span class="number">1</span> <span class="keyword">if</span> (i = <span class="property">@indexOfID</span> o.id) <span class="keyword">isnt</span> -<span class="number">1</span>
-      u.error <span class="string">"remove: indexOfID not in list"</span> <span class="keyword">if</span> i <span class="keyword">is</span> -<span class="number">1</span>
-    @
-
-  setDefault: (name, value) -&gt;
-    u.error <span class="string">"setDefault: name is not a string"</span> <span class="keyword">if</span> <span class="keyword">typeof</span> name <span class="keyword">isnt</span> <span class="string">"string"</span>
-    <span class="property">@agentClass</span>::[name] = value
-
-  own: (nameValueList...) -&gt;
-    u.error <span class="string">"own: odd number of arguments"</span> <span class="keyword">if</span> nameValueList.length % <span class="number">2</span> <span class="keyword">isnt</span> <span class="number">0</span>
-    <span class="keyword">for</span> name, i <span class="keyword">in</span> nameValueList <span class="keyword">by</span> <span class="number">2</span>
-      <span class="property">@setDefault</span> name, nameValueList[i+<span class="number">1</span>]
-      <span class="property">@ownVariables</span>.push name</pre></div></div>
+    u.removeItem <span class="property">@mainSet</span>, o <span class="keyword">if</span> <span class="property">@mainSet</span>?
+    u.removeItem @, o
+    @</pre></div></div>
             
         </li>
         
@@ -253,6 +238,62 @@ array is unsorted, simply call <code>sortById</code> first, see <code>sortById</
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Set the default value of a agent class, return agetnset</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  setDefault: (name, value) -&gt; <span class="property">@agentClass</span>::[name] = value; @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Declare variables of an agent class. Vars = a string of space separated names.
+Return agentset.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  own: (vars) -&gt; <span class="comment"># maybe not set default if val is null?</span>
+    <span class="keyword">for</span> name <span class="keyword">in</span> vars.split(<span class="string">" "</span>)
+      <span class="property">@setDefault</span> name, <span class="literal">null</span>
+      <span class="property">@ownVariables</span>.push name
+    @</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Move an agent from its AgentSet/breed to be in this AgentSet/breed.
+REMIND: match NetLogo sematics in terms of own variables.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  setBreed: (a) -&gt; <span class="comment"># change agent a to be in this breed</span>
+    u.removeItem a.breed, a, <span class="string">"id"</span> <span class="keyword">if</span> a.breed.mainSet?
+    u.insertItem @, a, <span class="string">"id"</span> <span class="keyword">if</span> <span class="property">@mainSet</span>?
+    proto = a.__proto__ = <span class="property">@agentClass</span>.prototype
+    <span class="keyword">delete</span> a[k] <span class="keyword">for</span> own k,v <span class="keyword">of</span> a <span class="keyword">when</span> proto[k]?
+    a</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
               <p>Remove adjacent duplicates, by reference, in a sorted agentset.
 Use <code>sortById</code> first if agentset not sorted.</p>
@@ -269,70 +310,18 @@ as.sortById().uniq() # [{id:0,x:0,y:1}, {id:1,x:8,y:0},
         </li>
         
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-10">&#182;</a>
-              </div>
-              <p>Return the agent with the given <code>id</code> within the sorted agentset.
-Uses binary search thus is faster than simple lookup.</p>
-<pre><code>AS.withID 4 # {id:4,x:1,y:1}</code></pre>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  withID: (id) -&gt; <span class="comment"># null if not found</span>
-    <span class="keyword">if</span> (i = <span class="property">@indexOfID</span>(id)) <span class="keyword">isnt</span> -<span class="number">1</span> <span class="keyword">then</span> @[i] <span class="keyword">else</span> <span class="literal">null</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-11">&#182;</a>
-              </div>
-              <p>Return the array index of the given agent id in the sorted set.
-If agentset is not sorted, call @sortById() first.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  indexOfID: (id, sorted=<span class="literal">true</span>) -&gt; <span class="comment"># -1 if not found</span>
-    <span class="property">@sortById</span>() <span class="keyword">unless</span> sorted
-    <span class="keyword">return</span> <span class="property">@length</span>-<span class="number">1</span> <span class="keyword">if</span> id <span class="keyword">is</span> <span class="property">@last</span>().id  <span class="comment"># no "die" calls yet</span>
-    u.binarySearch @, id, (o)-&gt;o.id</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-12">&#182;</a>
-              </div>
-              <p>The static <code>ABM.AgentSet.asSet</code> as a method.
-Used by agentset methods creating new agentsets.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  asSet: (a) -&gt; ABM.AgentSet.asSet a <span class="comment"># , @</span></pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-13">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <p>Similar to above but sorted via <code>id</code>.</p>
+              <p>The static <code>ABM.AgentSet.asSet</code> as a method.
+Used by agentset methods creating new agentsets.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  asOrderedSet: (a) -&gt; <span class="property">@asSet</span>(a).sortById()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  asSet: (a, setType = ABM.AgentSet) -&gt; ABM.AgentSet.asSet a, setType</pre></div></div>
             
         </li>
         
@@ -343,6 +332,21 @@ Used by agentset methods creating new agentsets.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
+              <p>Similar to above but sorted via <code>id</code>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  asOrderedSet: (a) -&gt; <span class="property">@asSet</span>(a).sortById()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
               <p>Return string representative of agentset.</p>
 
             </div>
@@ -352,32 +356,16 @@ Used by agentset methods creating new agentsets.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap for-h3">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <h3>Property Utilities</h3>
 <p>Property access, also useful for debugging<br></p>
 
             </div>
-            
-        </li>
-        
-        
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
-              <p>Return an array of a property of the agentset</p>
-<pre><code> AS.getProp &quot;x&quot; # [0, 8, 6, 1, 1]</code></pre>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  getProp: (prop) -&gt; o[prop] <span class="keyword">for</span> o <span class="keyword">in</span> @</pre></div></div>
             
         </li>
         
@@ -388,16 +376,12 @@ Used by agentset methods creating new agentsets.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
-              <p>Return an array of arrays of props, given as a string or an array of strings.</p>
-<pre><code>AS.getProps &quot;id x y&quot;
-AS.getProps [&quot;id&quot;, &quot;x&quot;, &quot;y&quot;]
-[[1,0,1],[2,8,0],[3,6,4],[4,1,3],[5,1,1]]</code></pre>
+              <p>Return an array of a property of the agentset</p>
+<pre><code> AS.getProp &quot;x&quot; # [0, 8, 6, 1, 1]</code></pre>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  getProps: (props) -&gt; 
-    props = props.split(<span class="string">" "</span>) <span class="keyword">if</span> u.isString props
-    (o[p] <span class="keyword">for</span> p <span class="keyword">in</span> props) <span class="keyword">for</span> o <span class="keyword">in</span> @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  getProp: (prop) -&gt; o[prop] <span class="keyword">for</span> o <span class="keyword">in</span> @</pre></div></div>
             
         </li>
         
@@ -425,7 +409,9 @@ AS.getProps [&quot;id&quot;, &quot;x&quot;, &quot;y&quot;]
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p>Set the property of the agents to a given value</p>
+              <p>Set the property of the agents to a given value.  If value
+is an array, its values will be used, indexed by agentSet&#39;s index.
+This is generally used via: getProp, modify results, setProp</p>
 <pre><code># increment x for agents with x=1
 AS1 = ABM.AgentSet.asSet AS.getPropWith(&quot;x&quot;,1)
 AS1.setProp &quot;x&quot;, 2 # {id:4,x:2,y:3},{id:5,x:2,y:1}</code></pre>
@@ -433,7 +419,10 @@ AS1.setProp &quot;x&quot;, 2 # {id:4,x:2,y:3},{id:5,x:2,y:1}</code></pre>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  setProp: (prop, value) -&gt; o[prop] = value <span class="keyword">for</span> o <span class="keyword">in</span> @; @</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  setProp: (prop, value) -&gt;
+    <span class="keyword">if</span> u.isArray value
+    <span class="keyword">then</span> o[prop] = value[i] <span class="keyword">for</span> o,i <span class="keyword">in</span> @; @
+    <span class="keyword">else</span> o[prop] = value <span class="keyword">for</span> o <span class="keyword">in</span> @; @</pre></div></div>
             
         </li>
         
@@ -450,8 +439,8 @@ max = AS.maxProp &quot;y&quot;  # 4</code></pre>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  maxProp: (prop) -&gt; Math.max <span class="property">@getProp</span>(prop)...
-  minProp: (prop) -&gt; Math.min <span class="property">@getProp</span>(prop)...</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  maxProp: (prop) -&gt; u.aMax <span class="property">@getProp</span>(prop)
+  minProp: (prop) -&gt; u.aMin <span class="property">@getProp</span>(prop)</pre></div></div>
             
         </li>
         
@@ -609,10 +598,8 @@ AS.maxOneOf((a)-&gt;a.x+a.y, true) # {id:2,x:6,y:4},10 </code></pre>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  minOneOf: (f, valueToo=<span class="literal">false</span>) -&gt;
-    u.minOneOf @, f, valueToo
-  maxOneOf: (f, valueToo=<span class="literal">false</span>) -&gt;
-    u.maxOneOf @, f, valueToo</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  minOneOf: (f, valueToo=<span class="literal">false</span>) -&gt; u.minOneOf @, f, valueToo
+  maxOneOf: (f, valueToo=<span class="literal">false</span>) -&gt; u.maxOneOf @, f, valueToo</pre></div></div>
             
         </li>
         

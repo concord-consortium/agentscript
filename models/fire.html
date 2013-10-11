@@ -1,17 +1,17 @@
 <html>
   <head>
     <title>AgentScript Model</title>
-    <script src="../agentscript.js"></script>
-    <script src="../coffee-script.js"></script>
+    <script src="../lib/agentscript.js"></script>
+    <script src="../tools/coffee-script.js"></script>
     <script type="text/coffeescript">
 
     u = ABM.util # ABM.util alias, u.s is also ABM.shape accessor.
     class MyModel extends ABM.Model
-      setup: -> # called by Model ctor
+      setup: ->
         @agentBreeds "embers fires"
-        @agents.setDefaultShape "square"
-        @agents.setDefaultColor [255,0,0]
-        @agents.setDefaultHeading(0) # override promotion to random angle
+        @agents.setDefault "shape", "square"
+        @agents.setDefault "color", [255,0,0]
+        @agents.setDefault "heading", 0 # override promotion to random angle
         
         @refreshPatches = false # <1fps->50-55fps, no surprise, app optimized for this 
         # No optimizations: 50-55fps
@@ -46,7 +46,7 @@
         p.color = [0, 0, 0] # in original model but apparently not needed, refresh off?
         @burnedTrees++
       fadeEmbers: ->
-        for a in @embers by -1 #()
+        for a in @embers by -1 # -1: allow die() in loop
           a.scaleColor a.color, .8
           if 100 > Math.max a.color... # or (Math.max a.color...) < 100 , needs parens
             a.p.color = a.color
@@ -54,21 +54,23 @@
             a.die()
       step: ->
         console.log @anim.toString() if @anim.ticks % 100 is 0
-        if not @agents.any() then @stop()
-        for a in @fires by -1# ()
+        unless @agents.any()
+          console.log "..stopping, fire done at tick: #{@anim.ticks}"
+          @stop()
+        for a in @fires by -1 # -1: allow changeBreed() in loop
           @ignite p for p in a.p.n4 when u.colorsEqual p.color, [0, 255, 0]
-          a.changeBreed @embers #a.breed = "embers"
+          @embers.setBreed a
         @fadeEmbers()
 
-    # div, patchSize, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true
-    #   NL Defaults: 13, -16, 16, -16, 16
-    APP=new MyModel "layers", 2, -125, 125, -125, 125, false #not torus
-    APP.setRootVars() # Put Model vars in global name space -- only for demo & debug
+    # div, patchSize, minX, maxX, minY, maxY, isTorus, hasNeighbors
+    #   Defaults: 13, -16, 16, -16, 16, false, true
+    model = new MyModel "layers", 2, -125, 125, -125, 125
+    model.debug() # Debug: Put Model vars in global name space
+    model.start() # Run model immediately after startup initialization
     
     </script>
   </head>
-  <body onload="ABM.model.start()">
-    <canvas id="test" style="height:0;width:0">Browser doesn't support HTML5 Canvas</canvas>
-    <div id="layers" style="position:relative;padding:20;"></div>
+  <body>
+    <div id="layers" style="padding:20"></div>
   </body>
 </html>
