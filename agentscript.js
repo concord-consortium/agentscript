@@ -2602,6 +2602,8 @@
         v = _ref[k];
         this.setCtxTransform(v);
       }
+      this.setSpotlight(null);
+      this.contexts.spotlight.globalCompositeOperation = "xor";
       return u.s.spriteSheets.length = 0;
     };
 

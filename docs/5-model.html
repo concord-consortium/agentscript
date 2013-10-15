@@ -489,6 +489,8 @@ are available in the ABM global.</p>
     <span class="property">@agents</span> = ABM.agents = <span class="keyword">new</span> ABM.Agents ABM.Agent, <span class="string">"agents"</span>
     <span class="property">@links</span> = ABM.links = <span class="keyword">new</span> ABM.Links ABM.Link, <span class="string">"links"</span>
     <span class="property">@setCtxTransform</span> v <span class="keyword">for</span> k,v <span class="keyword">of</span> <span class="property">@contexts</span> <span class="comment"># clear/resize all contexts</span>
+    <span class="property">@setSpotlight</span> <span class="literal">null</span>
+    <span class="property">@contexts</span>.spotlight.globalCompositeOperation = <span class="string">"xor"</span>
     u.s.spriteSheets.length = <span class="number">0</span> <span class="comment"># possibly null out entries?</span></pre></div></div>
             
         </li>
@@ -761,7 +763,7 @@ to avoid redrawing the same static scene. Called by animator.</p>
               </div>
               <p>Creates a spotlight effect on an agent, so we can follow it throughout the model.
 Use:</p>
-<pre><code>@setSpotliight breed.oneOf()</code></pre>
+<pre><code>@setSpotlight breed.oneOf()</code></pre>
 <p>to draw one of a random breed. Remove spotlight by passing <code>null</code></p>
 
             </div>

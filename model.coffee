@@ -141,6 +141,8 @@ class ABM.Model
     @agents = ABM.agents = new ABM.Agents ABM.Agent, "agents"
     @links = ABM.links = new ABM.Links ABM.Link, "links"
     @setCtxTransform v for k,v of @contexts # clear/resize all contexts
+    @setSpotlight null
+    @contexts.spotlight.globalCompositeOperation = "xor"
     u.s.spriteSheets.length = 0 # possibly null out entries?
   # reset, then setup and start the model
   restart: -> @reset(); @setup(); @start()
@@ -216,7 +218,7 @@ class ABM.Model
 # Creates a spotlight effect on an agent, so we can follow it throughout the model.
 # Use:
 #
-#     @setSpotliight breed.oneOf()
+#     @setSpotlight breed.oneOf()
 #
 # to draw one of a random breed. Remove spotlight by passing `null`
   setSpotlight: (@spotlightAgent) ->
