@@ -775,7 +775,7 @@ Use:</p>
     u.clearCtx ctx
     u.fillCtx ctx, [<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0.6</span>]
     ctx.beginPath()
-    ctx.arc agent.x, agent.y, <span class="number">3</span>, <span class="number">0</span>, <span class="number">2</span>*Math.PI, <span class="literal">false</span>
+    ctx.arc agent.x, agent.y, (<span class="property">@spotlightRadius</span> || <span class="number">3</span>), <span class="number">0</span>, <span class="number">2</span>*Math.PI, <span class="literal">false</span>
     ctx.fill()</pre></div></div>
             
         </li>
