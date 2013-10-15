@@ -1882,9 +1882,9 @@ class ABM.Model
   # Initialize/reset world parameters.
   setWorld: (size, minX, maxX, minY, maxY, isTorus=true, hasNeighbors=true) ->
     numX = maxX-minX+1; numY = maxY-minY+1; pxWidth = numX*size; pxHeight = numY*size
-    minXcor=minX-.5; maxXcor=maxX+.5; minYcor=minY-.5; maxYcor=maxY+.5
+    minXcor=minX-.5; maxXcor=maxX+.5; minYcor=minY-.5; maxYcor=maxY+.5; width = maxX - minX; height = maxY - minY
     ABM.world = @world = {size,minX,maxX,minY,maxY,minXcor,maxXcor,minYcor,maxYcor,
-      numX,numY,pxWidth,pxHeight,isTorus,hasNeighbors}
+      numX,numY,pxWidth,pxHeight,isTorus,hasNeighbors,width,height}
   setCtxTransform: (ctx) ->
     ctx.canvas.width = @world.pxWidth; ctx.canvas.height = @world.pxHeight
     ctx.save()

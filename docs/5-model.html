@@ -520,9 +520,9 @@ agentset is drawn only once, remaining static after that.</p>
             
             <div class="content"><div class='highlight'><pre>  setWorld: (size, minX, maxX, minY, maxY, isTorus=<span class="literal">true</span>, hasNeighbors=<span class="literal">true</span>) -&gt;
     numX = maxX-minX+<span class="number">1</span>; numY = maxY-minY+<span class="number">1</span>; pxWidth = numX*size; pxHeight = numY*size
-    minXcor=minX-<span class="number">.5</span>; maxXcor=maxX+<span class="number">.5</span>; minYcor=minY-<span class="number">.5</span>; maxYcor=maxY+<span class="number">.5</span>
+    minXcor=minX-<span class="number">.5</span>; maxXcor=maxX+<span class="number">.5</span>; minYcor=minY-<span class="number">.5</span>; maxYcor=maxY+<span class="number">.5</span>; width = maxX - minX; height = maxY - minY
     ABM.world = <span class="property">@world</span> = {size,minX,maxX,minY,maxY,minXcor,maxXcor,minYcor,maxYcor,
-      numX,numY,pxWidth,pxHeight,isTorus,hasNeighbors}
+      numX,numY,pxWidth,pxHeight,isTorus,hasNeighbors,width,height}
   setCtxTransform: (ctx) -&gt;
     ctx.canvas.width = <span class="property">@world</span>.pxWidth; ctx.canvas.height = <span class="property">@world</span>.pxHeight
     ctx.save()
