@@ -1079,6 +1079,7 @@ class ABM.Patch
   label: null         # text for the patch
   labelColor: [0,0,0] # text color
   labelOffset: [0,0]  # text offset from the patch center
+  labelContext: null
   
   # New Patch: Just set x,y. Neighbors set by Patches constructor if needed.
   constructor: (@x, @y) ->
@@ -1100,7 +1101,7 @@ class ABM.Patch
   draw: (ctx) ->
     ctx.fillStyle = u.colorStr @color
     ctx.fillRect @x-.5, @y-.5, 1, 1
-    @drawLabel(ctx)
+    @drawLabel(@labelContext || ctx)
 
   drawLabel: (ctx)->
     if @label? # REMIND: should be 2nd pass.
