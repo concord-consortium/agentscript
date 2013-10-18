@@ -541,6 +541,8 @@ increase positively downward and to the right).</p>
             <div class="content"><div class='highlight'><pre>  patchAtPixel: (x,y)-&gt;
     x = Math.floor(x/<span class="property">@size</span>) + <span class="property">@minX</span>
     y = <span class="property">@maxY</span> - Math.floor(y/<span class="property">@size</span>)
+    x = u.clamp x, <span class="property">@minX</span>, <span class="property">@maxX</span>
+    y = u.clamp y, <span class="property">@minY</span>, <span class="property">@maxY</span>
     <span class="keyword">return</span> <span class="property">@patchXY</span> x, y</pre></div></div>
             
         </li>

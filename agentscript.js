@@ -1618,6 +1618,8 @@
     Patches.prototype.patchAtPixel = function(x, y) {
       x = Math.floor(x / this.size) + this.minX;
       y = this.maxY - Math.floor(y / this.size);
+      x = u.clamp(x, this.minX, this.maxX);
+      y = u.clamp(y, this.minY, this.maxY);
       return this.patchXY(x, y);
     };
 

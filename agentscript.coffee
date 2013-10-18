@@ -1166,6 +1166,8 @@ class ABM.Patches extends ABM.AgentSet
   patchAtPixel: (x,y)->
     x = Math.floor(x/@size) + @minX
     y = @maxY - Math.floor(y/@size)
+    x = u.clamp x, @minX, @maxX
+    y = u.clamp y, @minY, @maxY
     return @patchXY x, y
 
   # Return a random valid float x,y point in patch space
