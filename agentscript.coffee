@@ -1690,7 +1690,11 @@ class ABM.Animator
   constructor: (@model, @rate=30, @multiStep=false, @drawRate=30) -> @reset() # init all animation state
   # Adjust animator.  This is used by programmer as the default animator will already have
   # been created by the time her model runs.
-  setRate: (@rate, @multiStep=false) -> @resetAnim()
+  setRate: (rate, @multiStep=false) ->
+    if @drawRate is @rate
+      @drawRate = rate
+    @rate = rate
+    @resetAnim()
   setDrawRate: (@drawRate) -> @resetAnim()
   # start/stop model, often used for debugging
   start: ->

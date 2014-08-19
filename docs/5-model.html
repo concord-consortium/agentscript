@@ -143,7 +143,11 @@ been created by the time her model runs.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">setRate</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@rate</span>, <span class="hljs-property">@multiStep</span>=<span class="hljs-literal">false</span>)</span> -&gt;</span> <span class="hljs-property">@resetAnim</span>()
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">setRate</span>: <span class="hljs-function"><span class="hljs-params">(rate, <span class="hljs-property">@multiStep</span>=<span class="hljs-literal">false</span>)</span> -&gt;</span>
+    <span class="hljs-keyword">if</span> <span class="hljs-property">@drawRate</span> <span class="hljs-keyword">is</span> <span class="hljs-property">@rate</span>
+      <span class="hljs-property">@drawRate</span> = rate
+    <span class="hljs-property">@rate</span> = rate
+    <span class="hljs-property">@resetAnim</span>()
   <span class="hljs-attribute">setDrawRate</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@drawRate</span>)</span> -&gt;</span> <span class="hljs-property">@resetAnim</span>()</pre></div></div>
             
         </li>

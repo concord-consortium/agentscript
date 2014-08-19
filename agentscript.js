@@ -2427,8 +2427,11 @@
     }
 
     Animator.prototype.setRate = function(rate, multiStep) {
-      this.rate = rate;
       this.multiStep = multiStep != null ? multiStep : false;
+      if (this.drawRate === this.rate) {
+        this.drawRate = rate;
+      }
+      this.rate = rate;
       return this.resetAnim();
     };
 
