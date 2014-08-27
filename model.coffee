@@ -60,7 +60,11 @@ class ABM.Animator
   # step and draw the model once, mainly debugging
   once: -> @step(); @draw()
   # Get current time, with high resolution timer if available
-  now: -> (performance ? Date).now()
+  now: ->
+    if performance?.now?
+      performance.now()
+    else
+      Date.now()
   # Time in ms since starting animator
   ms: -> @now()-@startMS
   # Get the number of ticks/draws per second.  They will differ if async

@@ -234,7 +234,11 @@ been created by the time her model runs.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">now</span>:<span class="hljs-function"> -&gt;</span> (performance ? Date).now()</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-attribute">now</span>:<span class="hljs-function"> -&gt;</span>
+    <span class="hljs-keyword">if</span> performance?.now?
+      performance.now()
+    <span class="hljs-keyword">else</span>
+      Date.now()</pre></div></div>
             
         </li>
         
