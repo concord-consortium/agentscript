@@ -2585,7 +2585,7 @@
     };
 
     function Model(div, size, minX, maxX, minY, maxY, isTorus, hasNeighbors) {
-      var ctx, k, v, _ref;
+      var k, v, _ref;
       this.div = div;
       if (isTorus == null) {
         isTorus = true;
@@ -2600,8 +2600,7 @@
       for (k in _ref) {
         if (!__hasProp.call(_ref, k)) continue;
         v = _ref[k];
-        this.contexts[k] = ctx = u.createLayer(div, this.world.width, this.world.height, v.z, v.ctx);
-        this.setCtxTransform(ctx);
+        this.addContext(k, v.z, v.ctx);
       }
       this.drawing = ABM.drawing = this.contexts.drawing;
       this.contexts.spotlight.globalCompositeOperation = "xor";
@@ -2612,6 +2611,15 @@
       this.links = ABM.links = new ABM.Links(ABM.Link, "links");
       this.setup();
     }
+
+    Model.prototype.addContext = function(name, z, ctx) {
+      if (ctx == null) {
+        ctx = "2d";
+      }
+      this.contexts[name] = ctx = u.createLayer(this.div, this.world.width, this.world.height, z, ctx);
+      this.setCtxTransform(ctx);
+      return ctx;
+    };
 
     Model.prototype.reset = function() {
       var k, v, _ref;
